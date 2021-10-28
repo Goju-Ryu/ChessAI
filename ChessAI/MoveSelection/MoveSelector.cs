@@ -40,18 +40,20 @@ namespace ChessAI.MoveSelection
     public class MoveSelector
     {
         private readonly bool _isWhite;
-        private string[] _bestMoves;
-        private IStateAnalyser _stateAnalyser;
-        private IMoveAnalyser _moveAnalyser;
-        private IMoveCalculator _moveCalculator;
+        private string[] _tempBestMoves;
+        
+        private readonly IStateAnalyser _stateAnalyser;
+        private readonly IMoveAnalyser _moveAnalyser;
+        private readonly IMoveCalculator _moveCalculator;
 
-        public string[] BestMoves => _bestMoves;
+        public string[] BestMoves { get; private set; }
 
         public MoveSelector(bool playerIsWhite, IStateAnalyser stateAnalyser, IMoveAnalyser moveAnalyser,
             IMoveCalculator moveCalculator, int initialMoveArraySize = 6)
         {
             _isWhite = playerIsWhite;
-            _bestMoves = Array.Empty<string>();//new string[initialMoveArraySize]; 
+            BestMoves = new string[initialMoveArraySize];
+            _tempBestMoves = new string[initialMoveArraySize];
             _stateAnalyser = stateAnalyser;
             _moveAnalyser = moveAnalyser;
             _moveCalculator = moveCalculator;
@@ -66,17 +68,23 @@ namespace ChessAI.MoveSelection
          */
         public string BestMove(int depth, GameState state)
         {
-            //TODO should this be rewritten to act nice with iterative deepening?
-            if (_bestMoves.Length < depth)
+            //TODO reduce amount of allocations and copies of arrays
+            if (BestMoves.Length < depth)
             {
                 var newArray = new string[depth];
-                _bestMoves.CopyTo(newArray, 0);
-                _bestMoves = newArray;
+                BestMoves.CopyTo(newArray, 0);
+                BestMoves = newArray;
             }
 
-            MinMax(depth, 0, true, state);
+            // To avoid _bestMoves and _tempBestMoves referring to the same array,
+            // _tempBestMoves have to be reassigned every call.
+            _tempBestMoves = new string[depth];
 
-            return _bestMoves[0];
+
+            MinMax(depth, 0, true, state);
+            BestMoves = _tempBestMoves;
+
+            return BestMoves[0];
         }
 
         public string BestMoveIterative(TimeSpan timeLimit, GameState state)
@@ -87,17 +95,16 @@ namespace ChessAI.MoveSelection
                 while (true)
                 {
                     BestMove(++depth, state);
-                    //MinMax(++depth, 0, true, state);
                 }
-                
-                
+
+
                 // This stops IDE from complaining about the infinite loop
                 // ReSharper disable once FunctionNeverReturns
             });
+
             task.Wait(timeLimit);
 
-
-            return _bestMoves[0];
+            return BestMoves[0];
         }
 
         /**
@@ -123,7 +130,7 @@ namespace ChessAI.MoveSelection
             // Generate moves, sort them and remove the previous best move to avoid
             // it being used in other branches than the best
             var moves = _moveCalculator.CalculatePossibleMoves(state, _isWhite == isMaximizer);
-            _moveAnalyser.SortMovesByBest(state, moves, _bestMoves[currentDepth]);
+            _moveAnalyser.SortMovesByBest(state, moves, BestMoves[currentDepth]);
 
             if (isMaximizer)
             {
@@ -141,7 +148,7 @@ namespace ChessAI.MoveSelection
                             return alpha;
                         }
 
-                        _bestMoves[currentDepth] = move;
+                        _tempBestMoves[currentDepth] = move;
                     }
                 }
 
@@ -163,7 +170,7 @@ namespace ChessAI.MoveSelection
                             return beta;
                         }
 
-                        _bestMoves[currentDepth] = move;
+                        _tempBestMoves[currentDepth] = move;
                     }
                 }
 
