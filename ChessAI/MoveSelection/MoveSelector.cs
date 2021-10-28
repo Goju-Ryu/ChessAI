@@ -19,7 +19,7 @@ namespace ChessAI.MoveSelection
         //Implementation goes here...
         //TODO replace string state with actual implementation
         public string State { get; }
-        
+
         /**
          * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
          * <param name="move">The move that should be applied to a state</param>
@@ -47,10 +47,11 @@ namespace ChessAI.MoveSelection
 
         public string[] BestMoves => _bestMoves;
 
-        public MoveSelector(bool playerIsWhite, IStateAnalyser stateAnalyser, IMoveAnalyser moveAnalyser, IMoveCalculator moveCalculator )
+        public MoveSelector(bool playerIsWhite, IStateAnalyser stateAnalyser, IMoveAnalyser moveAnalyser,
+            IMoveCalculator moveCalculator, int initialMoveArraySize = 6)
         {
             _isWhite = playerIsWhite;
-            _bestMoves = Array.Empty<string>();
+            _bestMoves = Array.Empty<string>();//new string[initialMoveArraySize]; 
             _stateAnalyser = stateAnalyser;
             _moveAnalyser = moveAnalyser;
             _moveCalculator = moveCalculator;
@@ -78,20 +79,24 @@ namespace ChessAI.MoveSelection
             return _bestMoves[0];
         }
 
-        public string BestMoveIterative(ulong timeLimit, GameState state)
+        public string BestMoveIterative(TimeSpan timeLimit, GameState state)
         {
-            //TODO implement this
-
-            ulong elapsedTime;
-            int depth = 1;
-            do
+            var task = Task.Run(() =>
             {
-                var startTime = DateTime.Now;
-                var task = new Task<int>(() => MinMax(depth++, 0, true, state));
+                int depth = 0;
+                while (true)
+                {
+                    BestMove(++depth, state);
+                    //MinMax(++depth, 0, true, state);
+                }
                 
-                elapsedTime = (ulong) (DateTime.Now - startTime).TotalMilliseconds;
-            } while ( (timeLimit -= elapsedTime) > 0);
-            
+                
+                // This stops IDE from complaining about the infinite loop
+                // ReSharper disable once FunctionNeverReturns
+            });
+            task.Wait(timeLimit);
+
+
             return _bestMoves[0];
         }
 
@@ -107,13 +112,14 @@ namespace ChessAI.MoveSelection
          * <param name="beta">The value storing the minimiser's current best value</param>
          * <returns>The evaluation value of the best outcome</returns>
          */
-        private int MinMax(int searchDepth, int currentDepth, bool isMaximizer, in GameState state, int alpha = Int32.MinValue, int beta = Int32.MaxValue)
+        private int MinMax(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
+            int alpha = Int32.MinValue, int beta = Int32.MaxValue)
         {
             if (searchDepth <= currentDepth)
             {
                 return _stateAnalyser.StaticAnalysis(state: state);
             }
-            
+
             // Generate moves, sort them and remove the previous best move to avoid
             // it being used in other branches than the best
             var moves = _moveCalculator.CalculatePossibleMoves(state, _isWhite == isMaximizer);
@@ -156,7 +162,7 @@ namespace ChessAI.MoveSelection
                         {
                             return beta;
                         }
-                        
+
                         _bestMoves[currentDepth] = move;
                     }
                 }
