@@ -16,7 +16,7 @@ namespace UnitTests
             var moveSelector =
                 new MoveSelector(true, moveAndState, new MoveAnalyserStub(), moveAndState);
 
-            Assert.AreEqual("b", moveSelector.BestMove(3, new GameState("")));
+            Assert.AreEqual("b", moveSelector.BestMove(new GameState(""), 3 ));
             Assert.AreEqual(new[] { "b", "g", "s" }, moveSelector.BestMoves);
         }
 
@@ -27,10 +27,13 @@ namespace UnitTests
             var moveSelector =
                 new MoveSelector(true, moveAndState, new MoveAnalyserStub(), moveAndState);
 
-            Assert.AreEqual("b", moveSelector.BestMoveIterative(TimeSpan.FromSeconds(10), new GameState("")));
+            Assert.AreEqual(
+                "b",
+                moveSelector.BestMoveIterative(new GameState(""), TimeSpan.FromSeconds(2), 3)
+            );
 
             var expectedPath = new[] { "b", "g", "s" };
-            for(int i = 0; i < expectedPath.Length; ++i)
+            for (int i = 0; i < expectedPath.Length; ++i)
             {
                 Assert.AreEqual(expectedPath[i], moveSelector.BestMoves[i]);
             }

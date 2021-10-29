@@ -66,7 +66,7 @@ namespace ChessAI.MoveSelection
          * <param name="depth">The depth to which the algorithm will search</param>
          * <param name="state">The current state of the game</param>
          */
-        public string BestMove(int depth, GameState state)
+        public string BestMove(GameState state, int depth)
         {
             //TODO reduce amount of allocations and copies of arrays
             if (BestMoves.Length < depth)
@@ -87,19 +87,28 @@ namespace ChessAI.MoveSelection
             return BestMoves[0];
         }
 
-        public string BestMoveIterative(TimeSpan timeLimit, GameState state)
+        /**
+         * <summary>
+         * The method to use if you want to perform a search for the best move with a time constraint.
+         * </summary>
+         * <param name="state">The current state of the game</param>
+         * <param name="timeLimit">
+         * The time constraint of the search.
+         * When this limit is hit the function will return and drop any potential searches it is attempting.
+         * </param>
+         * <param name="maxDepth">
+         * The depth to which the algorithm will search if it can do so within the allotted time span.
+         * If there is no max depth, set this argument to -1;
+         * </param>
+         */
+        public string BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = -1)
         {
             var task = Task.Run(() =>
             {
-                int depth = 0;
-                while (true)
+                for (int depth = 1; depth <= maxDepth; depth++)
                 {
-                    BestMove(++depth, state);
+                    BestMove(state, depth);
                 }
-
-
-                // This stops IDE from complaining about the infinite loop
-                // ReSharper disable once FunctionNeverReturns
             });
 
             task.Wait(timeLimit);

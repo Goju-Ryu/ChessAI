@@ -1,3 +1,4 @@
+using System;
 using BenchmarkDotNet.Attributes;
 using ChessAI.MoveSelection;
 using NUnit.Framework;
@@ -8,9 +9,9 @@ namespace BenchMarks
     [MemoryDiagnoser]
     public class MoveSelectorBenchmark
     {
-        [Params(1, 2, 4, 6)] //todo try deeper depths when they can be auto generated 
+        [Params(1, 2, 3, 4, 6)] //todo try deeper depths when they can be auto generated 
         public int Depth { get; set; }
-        [Params(0, 1, 3, 6, 12)]
+        [Params(0, 6, 12)]
         public int InitialPathArraySize { get; set; }
 
         public MoveSelector MoveSelector;
@@ -36,7 +37,11 @@ namespace BenchMarks
         }
 
         [Benchmark]
-        public string BestMove() => MoveSelector.BestMove(Depth, new GameState(""));
+        public string BestMove() => MoveSelector.BestMove(new GameState(""), Depth);
+
+        [Benchmark]
+        public string BestMoveIterative() =>
+            MoveSelector.BestMoveIterative(new GameState(""), TimeSpan.FromSeconds(30), Depth);
 
     }
 }
