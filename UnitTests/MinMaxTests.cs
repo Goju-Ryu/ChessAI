@@ -37,7 +37,7 @@ namespace UnitTests
         }
     }
 
-    internal class MoveAnalyserStub : IMoveAnalyser
+    public class MoveAnalyserStub : IMoveAnalyser
     {
         public int MoveAnalysis(GameState state, string move)
         {
@@ -63,7 +63,7 @@ namespace UnitTests
         }
     }
 
-    internal class MoveCalculatorStateAnalyserStub : IMoveCalculator, IStateAnalyser
+    public class MoveCalculatorStateAnalyserStub : IMoveCalculator, IStateAnalyser
     {
         private Dictionary<string, (int, string[])> _tree;
 
