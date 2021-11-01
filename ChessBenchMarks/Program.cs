@@ -8,8 +8,7 @@ namespace BenchMarks
         static void Main(string[] args)
         {
             var summary =
-                BenchmarkRunner
-                    .Run<BitBoardExampleBenchMark>(); //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+                BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         }
     }
 }
