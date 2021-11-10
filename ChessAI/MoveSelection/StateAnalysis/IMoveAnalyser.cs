@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
+using ChessAI.DataClasses;
 
-namespace ChessAI.MoveSelection
+namespace ChessAI.MoveSelection.StateAnalysis
 {
     public interface IMoveAnalyser
     {
