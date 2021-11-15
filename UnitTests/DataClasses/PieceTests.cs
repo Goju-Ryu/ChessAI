@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using ChessAI.DataClasses;
 using NUnit.Framework;
-using static ChessAI.DataClasses.FlagPiece;
+using static ChessAI.DataClasses.Piece;
 
 namespace UnitTests.DataClasses
 {
@@ -10,21 +9,34 @@ namespace UnitTests.DataClasses
         [Test]
         public void CreatePiece()
         {
-            FlagPiece piece = White | Bishop;
-            
-            Assert.AreEqual((0b0100 | (byte)Bishop), piece);
+            Piece piece = new Piece( White | Bishop );
+
+            var expected = 0b1000 | Bishop;
+            Assert.IsTrue(expected == piece);
         }
 
         [Test]
         public void PieceToString()
         {
-            var blackPieces = new List<FlagPiece>();
+            var black = "Black";
+            var white = "White";
+            var pieces = new[]
+            {
+                "None",
+                "Pawn",
+                "Rook",
+                "Knight",
+                "Bishop",
+                "Queen",
+                "King",
+            };
+            
+            
             for (byte i = 1; i < 6; i++)
             {
-                blackPieces.Add(Black | (FlagPiece)i);
+                Assert.AreEqual(white + " " + pieces[i], new Piece(White | i).ToString());
+                Assert.AreEqual(black + " " + pieces[i], new Piece(Black | i).ToString());
             }
-            
-            
-        } 
+        }
     }
 }

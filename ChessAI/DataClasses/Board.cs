@@ -8,18 +8,18 @@ namespace ChessAI.DataClasses
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
-        public static readonly Board EmptyBoard = new Board(new FlagPiece[Width * Height]);
+        public static readonly Board EmptyBoard = new Board(new Piece[Width * Height]);
 
-        public readonly FlagPiece[] Fields; //TODO consider using a Span<T> instead
+        public readonly Piece[] Fields; //TODO consider using a Span<T> instead
 
-        private Board(FlagPiece[] fields)
+        private Board(Piece[] fields)
         {
             Fields = fields;
         }
 
-        public Board(List<(byte, FlagPiece)> pieceIndexList)
+        public Board(List<(byte, Piece)> pieceIndexList)
         {
-            var fields = new FlagPiece[Width * Height];
+            var fields = new Piece[Width * Height];
             foreach (var pieceIndexPair in pieceIndexList)
             {
                 fields[pieceIndexPair.Item1] = pieceIndexPair.Item2;
@@ -30,7 +30,7 @@ namespace ChessAI.DataClasses
 
         public bool IsFieldOccupied(byte position)
         {
-            return Fields[position] == FlagPiece.None;
+            return Fields[position] == Piece.Empty;
         }
 
         public static bool IsIndexValid(byte index)
