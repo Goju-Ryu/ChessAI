@@ -1,90 +1,16 @@
 using System.Collections.Generic;
+using ChessAI.DataClasses;
 
-namespace ChessAI {
+namespace ChessAI.MoveSelection.MoveGeneration { 
 
-    /*
-        public static readonly sbyte MaxFields = 64;
-        public static readonly sbyte FieldsPrSide = 8;
-        public static readonly sbyte[] DirOffsets  = { 8, -8, -1, 1, 7, -7, 9, -9 };
-     
-     */
     public enum DirectionIndex {
         Up = 0, Down = 1, Left = 2, Right = 3,
         UpLeft = 4, DownRight=5, UpRight=7, DownLeft=8
     };
 
-    // Base Definitions and Setups 
-    public abstract partial class AMoveGenerator {
-
-        private partial void Init();
-        private partial void Init_moves();
-        public AMoveGenerator() {
-            Init();
-            Init_moves();
-        }
-
-        private partial sbyte[ ] GetDirections(sbyte index);
-        private partial sbyte GetFieldsToEdge(int position , int direction);
-    }
-    // Direction Board Implementation 
-    public abstract partial class AMoveGenerator {
-
-        sbyte[][] directionBoard;
-        private partial void Init() {
-            directionBoard = new sbyte[ 64 ][ ];
-            for(sbyte i = 0 ; i < 64 ; i++) {
-                // Stores information about how many rows there are up, down, left, right.
-                directionBoard[ i ] = GetDirections(i);
-            }
-        }
-        private partial sbyte[ ] GetDirections(sbyte index) {
-
-            int GetUp(int v) {
-                return v / FieldsPrSide;
-            }
-            int GetDown(int v , int up) {
-                return FieldsPrSide-1 - up;
-            }
-            int GetLeft(int v , int up) {
-                return v - (up * FieldsPrSide);
-            }
-            int GetRight(int v , int left) {
-                return FieldsPrSide-1 - left;
-            }
-
-            sbyte[] dirs = new sbyte[8];
-            int up, down, left, right;
-
-            up      = GetUp(index);
-            down    = GetDown(index , up);
-            left    = GetLeft(index , up);
-            right   = GetRight(index , left);
-
-            dirs[ (int)DirectionIndex.Up ] = (sbyte)up;
-            dirs[ (int)DirectionIndex.Down ] = (sbyte)down;
-            dirs[ (int)DirectionIndex.Left ] = (sbyte)left;
-            dirs[ (int)DirectionIndex.Right ] = (sbyte)right;
-
-            //dirs[ (int)DirectionIndex.UpRight	] = (sbyte)(up   > right ? up	: right);
-            //dirs[ (int)DirectionIndex.DownRight ] = (sbyte)(down > right ? down	: right);
-            //dirs[ (int)DirectionIndex.UpLeft	] = (sbyte)(up   > left	? up	: left);
-            //dirs[ (int)DirectionIndex.DownRight ] = (sbyte)(down > right ? down	: right);
-
-            return null;
-        }
-        private partial sbyte GetFieldsToEdge(int position , int direction) {
-            return (sbyte)directionBoard[ position ][ direction ];
-        }
-    }
 
     // Moves Implementation 
-    public abstract partial class AMoveGenerator {
-
-        private partial void Init_moves() {
-
-        }
-
-
+    public class MoveGenerator : IMoveCalculator{
                   
         //public enum DirectionIndex {
         //Up = 0, Down = 1, Left = 2, Right = 3,
@@ -104,24 +30,29 @@ namespace ChessAI {
         };
 
         private bool king , queen ;
-        public Move GenerateMoves(Pieces piece, byte position) {
+        public List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite){
+            return new List<Move>();
+        }
 
-            king = ( piece == Pieces.King );
-            queen = (piece == Pieces.Queen);
+        public List<Move> calcMovesForPiece(Piece piece , byte position ) {
+        
+            king = ( piece == Piece.King );
+            queen = (piece == Piece.Queen);
         
             List<Move> moves = new List<Move>();
-            if( king || queen || piece == Pieces.Rook ){
+            if( king || queen || piece == Piece.Rook ){
                 // i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
                 moves.AddRange( genLineMoves(position, king) );
             }   
 
-            if( king || queen  || piece == Pieces.Bishop ){
+            if( king || queen  || piece == Piece.Bishop ){
                  // COPY OF PREV COMMENT :::  i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
                 moves.AddRange( genDiagMoves(position, king) );
             }
 
-            return null;
+            return null;    
         }
+
 
         bool moreMoves;
         byte dirs;
