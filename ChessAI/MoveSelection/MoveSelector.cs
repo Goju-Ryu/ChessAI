@@ -1,37 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using ChessAI.DataClasses;
+using ChessAI.MoveSelection.MoveGeneration;
+using ChessAI.MoveSelection.StateAnalysis;
 
 namespace ChessAI.MoveSelection
 {
-    /**
-     * <summary>
-     * dummy struct representing a game state in some way
-     * </summary>
-     */
-    public readonly struct GameState
-    {
-        public GameState(string state)
-        {
-            State = state;
-        }
-
-        //Implementation goes here...
-        //TODO replace string state with actual implementation
-        public string State { get; }
-
-        /**
-         * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
-         * <param name="move">The move that should be applied to a state</param>
-         * <returns>A new <see cref="GameState"/> with the move applied</returns>
-         */
-        public GameState ApplyMove(string move)
-        {
-            //implementation goes here...
-            return new GameState(move);
-        }
-    }
-
     /**
      * <summary>
      * A Class that contains all the logic for finding the best move.
@@ -129,11 +103,11 @@ namespace ChessAI.MoveSelection
          * <returns>The evaluation value of the best outcome</returns>
          */
         private int MinMax(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
-            int alpha = Int32.MinValue, int beta = Int32.MaxValue)
+            int alpha = int.MinValue, int beta = int.MaxValue)
         {
             if (searchDepth <= currentDepth)
             {
-                return _stateAnalyser.StaticAnalysis(state: state);
+                return _stateAnalyser.StaticAnalysis(state);
             }
 
             // Generate moves, sort them and remove the previous best move to avoid

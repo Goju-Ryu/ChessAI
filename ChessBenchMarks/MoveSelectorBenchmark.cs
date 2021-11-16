@@ -1,6 +1,9 @@
 using System;
 using BenchmarkDotNet.Attributes;
+using ChessAI.DataClasses;
 using ChessAI.MoveSelection;
+using ChessAI.MoveSelection.MoveGeneration;
+using ChessAI.MoveSelection.StateAnalysis;
 using NUnit.Framework;
 using UnitTests;
 

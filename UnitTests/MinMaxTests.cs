@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChessAI;
+using ChessAI.DataClasses;
 using ChessAI.MoveSelection;
+using ChessAI.MoveSelection.MoveGeneration;
+using ChessAI.MoveSelection.StateAnalysis;
 using NUnit.Framework;
 
 namespace UnitTests

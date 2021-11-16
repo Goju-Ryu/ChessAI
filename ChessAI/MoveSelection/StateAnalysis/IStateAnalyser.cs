@@ -1,4 +1,6 @@
-namespace ChessAI.MoveSelection
+using ChessAI.DataClasses;
+
+namespace ChessAI.MoveSelection.StateAnalysis
 {
     public interface IStateAnalyser
     {

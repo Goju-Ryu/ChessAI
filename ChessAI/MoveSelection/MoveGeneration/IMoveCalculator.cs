@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using ChessAI.DataClasses;
 
-namespace ChessAI.MoveSelection
+namespace ChessAI.MoveSelection.MoveGeneration
 {
     public interface IMoveCalculator
     {
