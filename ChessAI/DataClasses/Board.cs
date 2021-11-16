@@ -8,7 +8,6 @@ namespace ChessAI.DataClasses
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
-        public static readonly Board EmptyBoard = new Board(new Piece[Width * Height]);
 
         public readonly Piece[] Fields; //TODO consider using a Span<T> instead
 
@@ -27,6 +26,8 @@ namespace ChessAI.DataClasses
 
             Fields = fields;
         }
+
+        public Piece this[int i] => Fields[i];
 
         public bool IsFieldOccupied(byte position)
         {
