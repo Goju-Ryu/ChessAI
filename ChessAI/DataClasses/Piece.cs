@@ -71,6 +71,9 @@ namespace ChessAI.DataClasses
         public const byte White = 0b1000;
         public const byte Black = 0; //TODO check this plays well with other functionality
 
+        public bool isWhite(){
+            return (White & _piece) != 0;
+        }
 
         public override string ToString()
         {
