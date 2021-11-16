@@ -19,7 +19,7 @@ namespace ChessAI.MoveSelection.StateAnalysis
          * favor of this engine while a negative one is in favor of its opponent no matter their color
          * </returns>
         */
-        int MoveAnalysis(GameState state, string move);
+        int MoveAnalysis(GameState state, Move move);
 
         /**
          * <summary>
@@ -35,6 +35,6 @@ namespace ChessAI.MoveSelection.StateAnalysis
          * high likelihood of being the best again
          * </param>
          */
-        void SortMovesByBest(GameState state, List<string> moves, string previousBest);
+        void SortMovesByBest(GameState state, List<Move> moves, Move previousBest);
     }
 }

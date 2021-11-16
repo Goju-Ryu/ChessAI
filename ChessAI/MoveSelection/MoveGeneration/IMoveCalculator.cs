@@ -13,6 +13,6 @@ namespace ChessAI.MoveSelection.MoveGeneration
          * </param>
          * <returns>A <see cref="List{T}"/> of all legal moves for the given player</returns>
          */
-        List<string> CalculatePossibleMoves(GameState state, bool calculateForWhite);
+        List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite);
     }
 }
