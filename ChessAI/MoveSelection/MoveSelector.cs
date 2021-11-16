@@ -1,37 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using ChessAI.DataClasses;
+using ChessAI.MoveSelection.MoveGeneration;
+using ChessAI.MoveSelection.StateAnalysis;
 
 namespace ChessAI.MoveSelection
 {
-    /**
-     * <summary>
-     * dummy struct representing a game state in some way
-     * </summary>
-     */
-    public readonly struct GameState
-    {
-        public GameState(string state)
-        {
-            State = state;
-        }
-
-        //Implementation goes here...
-        //TODO replace string state with actual implementation
-        public string State { get; }
-
-        /**
-         * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
-         * <param name="move">The move that should be applied to a state</param>
-         * <returns>A new <see cref="GameState"/> with the move applied</returns>
-         */
-        public GameState ApplyMove(string move)
-        {
-            //implementation goes here...
-            return new GameState(move);
-        }
-    }
-
     /**
      * <summary>
      * A Class that contains all the logic for finding the best move.
@@ -40,20 +14,20 @@ namespace ChessAI.MoveSelection
     public class MoveSelector
     {
         private readonly bool _isWhite;
-        private string[] _tempBestMoves;
+        private Move[] _tempBestMoves;
         
         private readonly IStateAnalyser _stateAnalyser;
         private readonly IMoveAnalyser _moveAnalyser;
         private readonly IMoveCalculator _moveCalculator;
 
-        public string[] BestMoves { get; private set; }
+        public Move[] BestMoves { get; private set; }
 
         public MoveSelector(bool playerIsWhite, IStateAnalyser stateAnalyser, IMoveAnalyser moveAnalyser,
             IMoveCalculator moveCalculator, int initialMoveArraySize = 6)
         {
             _isWhite = playerIsWhite;
-            BestMoves = new string[initialMoveArraySize];
-            _tempBestMoves = new string[initialMoveArraySize];
+            BestMoves = new Move[initialMoveArraySize];
+            _tempBestMoves = new Move[initialMoveArraySize];
             _stateAnalyser = stateAnalyser;
             _moveAnalyser = moveAnalyser;
             _moveCalculator = moveCalculator;
@@ -66,19 +40,19 @@ namespace ChessAI.MoveSelection
          * <param name="depth">The depth to which the algorithm will search</param>
          * <param name="state">The current state of the game</param>
          */
-        public string BestMove(GameState state, int depth)
+        public Move BestMove(GameState state, int depth)
         {
             //TODO reduce amount of allocations and copies of arrays
             if (BestMoves.Length < depth)
             {
-                var newArray = new string[depth];
+                var newArray = new Move[depth];
                 BestMoves.CopyTo(newArray, 0);
                 BestMoves = newArray;
             }
 
             // To avoid _bestMoves and _tempBestMoves referring to the same array,
             // _tempBestMoves have to be reassigned every call.
-            _tempBestMoves = new string[depth];
+            _tempBestMoves = new Move[depth];
 
 
             MinMax(depth, 0, true, state);
@@ -101,7 +75,7 @@ namespace ChessAI.MoveSelection
          * If there is no max depth, set this argument to -1;
          * </param>
          */
-        public string BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = -1)
+        public Move BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = -1)
         {
             var task = Task.Run(() =>
             {
@@ -129,11 +103,11 @@ namespace ChessAI.MoveSelection
          * <returns>The evaluation value of the best outcome</returns>
          */
         private int MinMax(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
-            int alpha = Int32.MinValue, int beta = Int32.MaxValue)
+            int alpha = int.MinValue, int beta = int.MaxValue)
         {
             if (searchDepth <= currentDepth)
             {
-                return _stateAnalyser.StaticAnalysis(state: state);
+                return _stateAnalyser.StaticAnalysis(state);
             }
 
             // Generate moves, sort them and remove the previous best move to avoid
