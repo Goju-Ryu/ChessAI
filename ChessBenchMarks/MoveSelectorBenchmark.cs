@@ -40,11 +40,11 @@ namespace BenchMarks
         }
 
         [Benchmark]
-        public string BestMove() => MoveSelector.BestMove(new GameState(""), Depth);
+        public Move BestMove() => MoveSelector.BestMove(new GameState(), Depth);
 
         [Benchmark]
-        public string BestMoveIterative() =>
-            MoveSelector.BestMoveIterative(new GameState(""), TimeSpan.FromSeconds(30), Depth);
+        public Move BestMoveIterative() =>
+            MoveSelector.BestMoveIterative(new GameState(), TimeSpan.FromSeconds(30), Depth);
 
     }
 }
