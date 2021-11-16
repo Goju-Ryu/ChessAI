@@ -16,6 +16,7 @@ namespace ChessAI{
 		bool IsFieldEnemouriouslyConqueredByEvil(byte position);
 
 	}
+	
 	public class DirectionBoard{
 		
 		public static readonly byte MaxFields = 64;
