@@ -221,29 +221,6 @@ namespace ChessAI {
     }
 
 
-    /*struct MoveOffset {
-
-
-
-        public static readonly sbyte[] offsets;
-        public MoveOffset(
-            sbyte up = 0 , sbyte down = 0 , sbyte left = 0 , sbyte right = 0 ,
-            sbyte upLeft = 0 , sbyte upRight = 0 , sbyte downLeft = 0 , sbyte downRight = 0
-        ) {
-            sbyte[] offs = new sbyte[8];
-            offs[ (int)DirectionIndex.Up ]     = up;
-            offs[ (int)DirectionIndex.Down ]   = down;
-            offs[ (int)DirectionIndex.Left ]   = left;
-            offs[ (int)DirectionIndex.Right ]  = right;
-
-
-            offs[ (int)DirectionIndex.UpRight ]     = upRight;
-            offs[ (int)DirectionIndex.DownRight ]   = downRight;
-            offs[ (int)DirectionIndex.UpLeft ]      = upLeft;
-            offs[ (int)DirectionIndex.DownLeft ]    = downLeft;
-
-        }
-    }*/
 
 
 }
