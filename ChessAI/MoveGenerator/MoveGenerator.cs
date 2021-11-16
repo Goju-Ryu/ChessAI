@@ -2,6 +2,12 @@ using System.Collections.Generic;
 
 namespace ChessAI {
 
+    /*
+        public static readonly sbyte MaxFields = 64;
+        public static readonly sbyte FieldsPrSide = 8;
+        public static readonly sbyte[] DirOffsets  = { 8, -8, -1, 1, 7, -7, 9, -9 };
+     
+     */
     public enum DirectionIndex {
         Up = 0, Down = 1, Left = 2, Right = 3,
         UpLeft = 4, DownRight=5, UpRight=7, DownLeft=8
@@ -9,13 +15,6 @@ namespace ChessAI {
 
     // Base Definitions and Setups 
     public abstract partial class AMoveGenerator {
-
-
-        public static readonly sbyte MaxFields = 64;
-        public static readonly sbyte FieldsPrSide = 8;
-        public static readonly sbyte[] DirOffsets  = { 8, -8, -1, 1, 7, -7, 9, -9 };
-
-
 
         private partial void Init();
         private partial void Init_moves();
@@ -93,7 +92,7 @@ namespace ChessAI {
 
         // this is made to fit this Direction Index. 
 
-        public static readonly byte[] X88Dirs  = { 
+        public static readonly sbyte[] X88Dirs  = { 
              0x10,  // 1 up     0 x
             -0x10,  // 1 down   0 x
              0x01,  // 0 x      1 right
@@ -137,9 +136,12 @@ namespace ChessAI {
                 
                 while(moreMoves){
                     // this adds the offset 
-                    tempPos += X88Dirs[ dirs ];
+                    tempPos = (byte)(tempPos + X88Dirs[ dirs ]);
 
                     if(false) // IS OUT OF BOUNDS OF BOARD 
+                        break;
+
+                    if(false) // is Blocked
                         break;
 
                     // createMove and Add to list 
@@ -160,29 +162,65 @@ namespace ChessAI {
             for(dirs = 4 ; dirs < 8 ; dirs++) {
 
                 tempPos = position;
-                
-                while(moreMoves){
+
+                while(moreMoves) {
                     // this adds the offset 
-                    tempPos += X88Dirs[ dirs ];
+                    tempPos = (byte)(tempPos + X88Dirs[ dirs ]);
 
                     if(false) // IS OUT OF BOUNDS OF BOARD 
                         break;
 
                     if(false) // is blocked by self ?? 
+                        break;
 
                     // createMove and Add to list 
-                    moves.Add( new Move( position, tempPos ) ) ;
+                    moves.Add(new Move(position , tempPos));
 
 
-                // for all directions. First 4, up down left right.  
-                if(depthIs1)
-                    break;
+                    // for all directions. First 4, up down left right.  
+                    if(depthIs1)
+                        break;
                 }
             }
-            return null;
+            return moves;
         }
-        
+
+        // source https://learn.inside.dtu.dk/d2l/le/content/80615/viewContent/284028/View
+        sbyte[] horseMoves = {
+            0x21,    // two up one right
+            0x1F,    // two up one left
+            0x12,    // one up two right
+            0x0E,    // one up two left
+            -0x21,    // two down one left
+            -0x1F,    // two down one right
+            -0x12,    // one down two left
+            -0x0E
+        };
+        private List<Move> genHorseMoves(byte position , bool depthIs1) {
+             List<Move> moves = new List<Move>();
+            for(dirs = 0 ; dirs < horseMoves.Length ; dirs++) {
+                // this adds the offset 
+                tempPos = (byte)(tempPos + horseMoves[ dirs ]);
+
+                if(false) { // IS OUT OF BOUNDS OF BOARD 
+
+                    continue;
+                }
+
+                if(false) { // is blocked by self ?? 
+
+                    continue;
+                }
+
+
+                // createMove and Add to list 
+                moves.Add(new Move(position , tempPos));
+            }
+            return moves;
+        }
     }
+
+
     /*struct MoveOffset {
 
 
