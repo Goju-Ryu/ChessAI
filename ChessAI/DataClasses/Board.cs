@@ -48,6 +48,10 @@ namespace ChessAI.DataClasses
 
         public Piece this[int i] => Fields[i];
 
+        public bool isFieldOwnedByWhite(byte position){
+            return Fields[ position ].isWhite();
+        }
+
         public bool IsFieldOccupied(byte position)
         {
             return Fields[position] == Piece.Empty;
