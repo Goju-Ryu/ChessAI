@@ -23,38 +23,50 @@ namespace ChessAI.DataClasses
         /// </remarks>
         public GameState(Board board)
         {
-            State = board;
-            List<byte>[] tempPieceList = new List<byte>[6];
-            for (var i = 0; i < tempPieceList.Length; i++)
-            {
-                tempPieceList[i] = new List<byte>();
-            }
+            var tempBoardFields = board.Fields; 
             
-            for (byte i = 0; i < 0x88; i++)
-            {
-                if (!Board.IsIndexValid(i))
-                {
-                    i += 0x8;
-                }
+            List<Piece> tempWhitePieceList = new List<Piece>();
+            List<Piece> tempBlackPieceList = new List<Piece>();
 
-                var currentPiece = board[i];
+            // Fill PieceLists
+            for (byte index = 0; index < 0x88; index++)
+            {
+                // if the index is invalid we have exceeded the boundaries of the board.
+                // The body of the loop is skipped until the next valid index is encountered.
+                if (!Board.IsIndexValid(index)) continue; 
+
+                var currentPiece = board[index];
                 if (currentPiece != Empty)
                 {
-                    tempPieceList[currentPiece.PieceType - 1].Add(i);
+                    
+                    // If the found piece doesn't have the right position then set it 
+                    if (currentPiece.Position != index)
+                    {
+                        currentPiece = new Piece(currentPiece.Content, index);
+                        tempBoardFields[index] = currentPiece;
+                    }
+                    
+                    if ((currentPiece.PieceFlags & White) == White)
+                    {
+                        tempWhitePieceList.Add(currentPiece);
+                    }
+                    else
+                    {
+                        tempBlackPieceList.Add(currentPiece);
+                    }
                 }
             }
 
-            PieceList = new byte[6][];
-
-            for (int i = 0; i < PieceList.Length; i++)
-            {
-                PieceList[i] = tempPieceList[i].ToArray();
-            }
+            State = new Board(tempBoardFields);
+            WhitePieces = tempWhitePieceList.ToArray();
+            BlackPieces = tempBlackPieceList.ToArray();
         }
 
 
         public readonly Board State;
-        public readonly byte[][] PieceList; 
+        public readonly Piece[] WhitePieces;
+        public readonly Piece[] BlackPieces;
+        
 
         /**
          * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>

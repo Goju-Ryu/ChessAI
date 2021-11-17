@@ -11,17 +11,36 @@ namespace ChessAI.DataClasses
 
         public readonly Piece[] Fields; //TODO consider using a Span<T> instead
 
-        private Board(Piece[] fields)
+        /// <summary>
+        /// A constructor taking an array of pieces representing the board. Note that the array length must
+        /// be consistent with an 0x88 board.
+        /// </summary>
+        /// <param name="fields">an array representing the board</param>
+        /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
+        public Board(Piece[] fields)
         {
+            if (fields.Length != 0x88)
+            {
+                throw new ArgumentException(
+                    "fields must be an array of length 0x" + 0x88.ToString("X") + " / 0d" + 0x88 + 
+                    " but the provided array had length 0x" + fields.Length.ToString("X") + " / 0d" + fields.Length
+                );
+            }
+
             Fields = fields;
         }
 
-        public Board(List<(byte, Piece)> pieceIndexList)
+        /// <summary>
+        /// A Constructor that takes a list of fields. It is assumed that all pieces have valid positions set.
+        /// If one or more pieces has an invalid position it can lead to unexpected behavior.
+        /// </summary>
+        /// <param name="pieceList">A list of pieces with valid positions</param>
+        public Board(List<Piece> pieceList)
         {
             var fields = new Piece[Width * Height];
-            foreach (var pieceIndexPair in pieceIndexList)
+            foreach (var piece in pieceList)
             {
-                fields[pieceIndexPair.Item1] = pieceIndexPair.Item2;
+                fields[piece.Position] = piece;
             }
 
             Fields = fields;
