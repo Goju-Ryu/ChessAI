@@ -145,5 +145,12 @@ namespace ChessAI.DataClasses
         public static bool operator ==(Piece a, int b) => a._piece == b;
         public static bool operator !=(int a, Piece b) => a != b._piece;
         public static bool operator !=(Piece a, int b) => a._piece != b;
+
+        public static implicit operator Piece( byte b){
+            return new Piece(b);
+        }
+        public static implicit operator byte( Piece p){
+            return p.Content ;
+        }
     }
 }
