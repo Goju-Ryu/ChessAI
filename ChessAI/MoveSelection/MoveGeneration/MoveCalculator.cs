@@ -56,26 +56,18 @@ namespace ChessAI.MoveSelection.MoveGeneration
             if (king || queen || piece == Piece.Rook)
             {
                 // i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
-                moves.AddRange(genLineMoves(position, king));
+                moves.AddRange( genLineMoves(piece.Position, king) );
             }
 
             if (king || queen || piece == Piece.Bishop)
             {
                 // COPY OF PREV COMMENT :::  i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
-                moves.AddRange(genDiagMoves(position, king));
+                moves.AddRange( genDiagMoves(piece.Position, king) );
             }
 
             return moves;
         }
-
-        // Datastructur og Algorithme
-
-        // m�linger p� Cutoff - 
-
-        // effektiv forgr�ning faktor
-
-        // I takk med inf�ring af varialber der flytter kurven .  
-
+        
 
         bool moreMoves;
         byte dirs;
@@ -141,7 +133,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     tempPos = (byte)(tempPos + X88Dirs[dirs]);
 
                     // IS OUT OF BOUNDS OF BOARD 
-                    if (!(Board.IsIndexValid(tempPos)))
+                    if( !(Board.IsIndexValid(tempPos)) ) 
                         break;
 
                     // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
@@ -174,14 +166,14 @@ namespace ChessAI.MoveSelection.MoveGeneration
         // source https://learn.inside.dtu.dk/d2l/le/content/80615/viewContent/284028/View
         sbyte[] horseMoves =
         {
-            0x21, // two up one right
-            0x1F, // two up one left
-            0x12, // one up two right
-            0x0E, // one up two left
-            -0x21, // two down one left
-            -0x1F, // two down one right
-            -0x12, // one down two left
-            -0x0E
+            0x21,     // two up one right
+            0x1F,     // two up one left
+            0x12,     // one up two right
+            0x0E,     // one up two left
+            -0x21,    // two down one left
+            -0x1F,    // two down one right
+            -0x12,    // one down two left
+            -0x0E     // one down Two Right
         };
 
         private List<Move> genHorseMoves(byte position, bool depthIs1)

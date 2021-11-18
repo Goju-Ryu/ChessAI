@@ -2,8 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ChessAI.DataClasses
-{
+namespace ChessAI.DataClasses {
+    
+    
+    public enum BT : int {
+            ColA = 0x00,   
+            ColB = 0x10,   
+            ColC = 0x20,   
+            ColD = 0x30,
+            ColE = 0x40,   
+            ColF = 0x50,   
+            ColG = 0x60,   
+            ColH = 0x70,
+
+            Row1 = 0x00,   
+            Row2 = 0x01,   
+            Row3 = 0x02,   
+            Row4 = 0x03,
+            Row5 = 0x04,   
+            Row6 = 0x05,   
+            Row7 = 0x06,   
+            Row8 = 0x07
+    };
+    
     public readonly struct Board
     {
         private const byte Width = 0x10;
@@ -54,7 +75,7 @@ namespace ChessAI.DataClasses
 
         public bool IsFieldOccupied(byte position)
         {
-            return Fields[position] == Piece.Empty;
+            return Fields[position].PieceType != Piece.Empty;
         }
 
         public static bool IsIndexValid(byte index)

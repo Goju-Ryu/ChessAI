@@ -67,6 +67,8 @@ namespace ChessAI.DataClasses
         public const byte Queen = 0b0101;
         public const byte King = 0b0110;
 
+        public const byte NumOfTypes = 6;
+
         // Flags
         public const byte White = 0b1000;
         public const byte Black = 0; //TODO check this plays well with other functionality
@@ -146,11 +148,6 @@ namespace ChessAI.DataClasses
         public static bool operator !=(int a, Piece b) => a != b._piece;
         public static bool operator !=(Piece a, int b) => a._piece != b;
 
-        public static implicit operator Piece( byte b){
-            return new Piece(b);
-        }
-        public static implicit operator byte( Piece p){
-            return p.Content ;
-        }
+
     }
 }
