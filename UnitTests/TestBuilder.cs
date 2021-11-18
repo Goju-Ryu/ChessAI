@@ -2,6 +2,8 @@ using ChessAI.DataClasses;
 using NUnit.Framework;
 using System;
 
+using System.Collections.Generic;
+
 namespace UnitTests{
 
         public enum BT : int {
@@ -71,10 +73,30 @@ namespace UnitTests{
         }
         
         public static Board generateEmptyBoard(){
-            Piece[] p = new Piece[1];
-            p[0] = new Piece(Piece.Empty, 1);
-            return new Board(p);
+
+            List<Piece> pieces = new List<Piece>();
+            for (int i = 0; i < 0x80; i++)
+            {
+             pieces.Add( new Piece(Piece.Empty , i ) );   
+            }
+
+            Board board = new Board(pieces);
+            return board;
         }
+
+        public static Board GenerateBoard(List<Piece> pieces){
+
+            Board board = generateEmptyBoard();
+
+            List<Piece> newPieces = new List<Piece>(board.Fields);
+            foreach(Piece piece in pieces){
+                newPieces[piece.Position] = piece;
+            }
+
+            Board newBoard = new Board(newPieces);
+            return newBoard;
+        }
+
 
 
 
