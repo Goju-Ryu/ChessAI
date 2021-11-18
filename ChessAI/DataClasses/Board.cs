@@ -19,7 +19,7 @@ namespace ChessAI.DataClasses
         /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
         public Board(Piece[] fields)
         {
-            if (fields.Length != 0x88)
+            if (fields.Length != (Width * Height))
             {
                 throw new ArgumentException(
                     "fields must be an array of length 0x" + 0x88.ToString("X") + " / 0d" + 0x88 + 
