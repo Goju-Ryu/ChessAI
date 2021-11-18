@@ -52,6 +52,18 @@ namespace ChessAI.DataClasses
             Position = position;
             _piece = (byte)flags;
         }
+
+        public Piece(byte flags, int position)
+        {
+            Position = (byte)position;
+            _piece = flags;
+        }
+
+        public Piece(int flags, int position)
+        {
+            Position = (byte)position;
+            _piece = (byte)flags;
+        }
         //######################################//
         // Constants for easy use of this type  //
         //######################################//
