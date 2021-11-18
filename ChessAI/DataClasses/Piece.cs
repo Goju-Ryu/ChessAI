@@ -86,7 +86,7 @@ namespace ChessAI.DataClasses
             builder.Append(
                 (PieceType) switch
                 {
-                    0 => ".",
+                    0 =>  this.Position.ToString("X4"),
                     1 => "P",
                     2 => "R",
                     3 => "K",
