@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ChessAI.DataClasses;
+using System;
 
 namespace ChessAI.MoveSelection.MoveGeneration
 {
@@ -17,7 +18,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
 
 
     // Moves Implementation 
-    public class MoveGenerator : IMoveCalculator
+    public class MoveCalculator : IMoveCalculator
     {
         //public enum DirectionIndex {
         //Up = 0, Down = 1, Left = 2, Right = 3,
@@ -25,123 +26,93 @@ namespace ChessAI.MoveSelection.MoveGeneration
 
         // this is made to fit this Direction Index. 
 
-        public static readonly sbyte[] X88Dirs =
+        public static readonly sbyte[] X80Dirs =
         {
-            0x10, // 1 up     0 x
+            +0x10, // 1 up     0 x
             -0x10, // 1 down   0 x
-            0x01, // 0 x      1 right
+            +0x01, // 0 x      1 right
             -0x01, // 0 x      1 left
-            0x0e, // 1 up     1 left
+            +0x11, // 1 up     1 left
             -0x11, // 1 down   1 right 
-            0x11, // 1 up     1 right
-            -0x0e // 1 down   1 left 
+            +0x0f, // 1 up     1 right
+            -0x0f  // 1 down   1 left 
         };
-
-        private bool king, queen;
-        private GameState currentState;
-        private bool isWhite;
 
         public List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite)
         {
             List<Move> moves = new List<Move>();
+
+
+            //Piece[] pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
+            Piece[] pieces = state.State.Fields;
+
+            foreach (Piece piece in pieces)
+            {
+                moves.AddRange(calcMovesForPiece(state,piece));
+            }
+
             return moves;
         }
 
-        public List<Move> calcMovesForPiece(Piece piece, byte position)
+        public List<Move> calcMovesForPiece(GameState state,Piece piece)
         {
-            king = (piece == Piece.King);
-            queen = (piece == Piece.Queen);
+            bool king  = (piece == Piece.King); // Also used as single distance boolean
+            bool queen = (piece == Piece.Queen);
 
             List<Move> moves = new List<Move>();
+
             if (king || queen || piece == Piece.Rook)
             {
-                // i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
-                moves.AddRange( genLineMoves(piece.Position, king) );
+                //Console.WriteLine("LINES  ");
+                moves.AddRange(genLineMoves( state , piece , king ));
             }
 
             if (king || queen || piece == Piece.Bishop)
             {
-                // COPY OF PREV COMMENT :::  i add king to this mehtod, because it is the only piece that has a limit of 1 distance, since "king" is a bool, i pass it as "depthIs1"
-                moves.AddRange( genDiagMoves(piece.Position, king) );
+                //Console.WriteLine("DIAG   ");
+                moves.AddRange(genDiagMoves( state , piece , king ));
+            }
+
+            if( piece == Piece.Knight){
+                //Console.WriteLine("KNIGHT ");
+                moves.AddRange(genHorseMoves(state, piece));
+            }
+
+            if( piece == Piece.Pawn){
+                //Console.WriteLine("PAWN   ");
+                moves.AddRange(genHorseMoves(state, piece));
             }
 
             return moves;
         }
-        
 
-        bool moreMoves;
-        byte dirs;
-        byte tempPos;
-
-        private List<Move> genLineMoves(byte position, bool depthIs1)
+        private List<Move> genLineMoves(GameState state , Piece piece , bool depthIs1)
         {
+            bool moreMoves = true;
+            byte dirs;
+            byte tempPos;
+
             List<Move> moves = new List<Move>();
             moreMoves = true;
+
             for (dirs = 0; dirs < 4; dirs++)
             {
-                tempPos = position;
-                moreMoves = true;
-                while (moreMoves)
-                {
-                    // this adds the offset, to generate new position
-                    tempPos = (byte)(tempPos + X88Dirs[dirs]);
-
-                    // IS OUT OF BOUNDS OF BOARD 
-                    if (!(Board.IsIndexValid(tempPos)))
-                        break;
-
-                    // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
-                    if (currentState.State.IsFieldOccupied(tempPos))
-                    {
-                        // is Blocked
-                        // is Enemy Piece ?? 
-                        if (isWhite != currentState.State.isFieldOwnedByWhite(tempPos))
-                        {
-                            moreMoves = false; // if it is an enemy we want to end the loop after it is finished
-                        }
-                        else
-                        {
-                            break; // if it is not an enemy then we want to end the loop NOW!
-                        }
-                    }
-
-                    // createMove and Add to list 
-                    moves.Add(new Move(position, tempPos));
-
-
-                    // for all directions. First 4, up down left right.  
-                    if (depthIs1)
-                        break;
-                }
-            }
-
-            return moves;
-        }
-
-        private List<Move> genDiagMoves(byte position, bool depthIs1)
-        {
-            List<Move> moves = new List<Move>();
-            moreMoves = true;
-            for (dirs = 4; dirs < 8; dirs++)
-            {
-                tempPos = position;
+                tempPos = piece.Position;
                 moreMoves = true;
 
                 while (moreMoves)
                 {
                     // this adds the offset 
-                    tempPos = (byte)(tempPos + X88Dirs[dirs]);
-
-                    // IS OUT OF BOUNDS OF BOARD 
-                    if( !(Board.IsIndexValid(tempPos)) ) 
+                    tempPos = (byte)(tempPos + X80Dirs[dirs]);
+                    if (!(Board.IsIndexValid(tempPos)))
+                    {
                         break;
+                    }
 
                     // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
-                    if (currentState.State.IsFieldOccupied(tempPos))
+                    if (state.State.IsFieldOccupied(tempPos))
                     {
-                        // is Blocked
-                        // is Enemy Piece ?? 
-                        if (isWhite != currentState.State.isFieldOwnedByWhite(tempPos))
+                        if ( piece.isWhite() != state.State.isFieldOwnedByWhite(tempPos) )
                         {
                             moreMoves = false; // if it is an enemy we want to end the loop after it is finished
                         }
@@ -152,7 +123,55 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     }
 
                     // createMove and Add to list 
-                    moves.Add(new Move(position, tempPos));
+                    moves.Add(new Move(piece.Position, tempPos));
+
+                    // for all directions. First 4, up down left right.  
+                    if (depthIs1)
+                        break;
+                }
+            }
+            
+            return moves;
+        }
+        private List<Move> genDiagMoves( GameState state , Piece piece , bool depthIs1)
+        {
+
+            bool moreMoves = true;
+            byte dirs;
+            byte tempPos;
+
+            List<Move> moves = new List<Move>();
+            moreMoves = true;
+
+            for (dirs = 4; dirs < 8; dirs++)
+            {
+                tempPos = piece.Position;
+                moreMoves = true;
+
+                while (moreMoves)
+                {
+                    // this adds the offset 
+                    tempPos = (byte)(tempPos + X80Dirs[dirs]);
+                    if (!(Board.IsIndexValid(tempPos)))
+                    {
+                        break;
+                    }
+
+                    // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
+                    if (state.State.IsFieldOccupied(tempPos))
+                    {
+                        if ( piece.isWhite() != state.State.isFieldOwnedByWhite(tempPos) )
+                        {
+                            moreMoves = false; // if it is an enemy we want to end the loop after it is finished
+                        }
+                        else
+                        {
+                            break; // if it is not an enemy then we want to end the loop NOW!
+                        }
+                    }
+
+                    // createMove and Add to list 
+                    moves.Add(new Move(piece.Position, tempPos));
 
                     // for all directions. First 4, up down left right.  
                     if (depthIs1)
@@ -162,48 +181,49 @@ namespace ChessAI.MoveSelection.MoveGeneration
 
             return moves;
         }
-
         // source https://learn.inside.dtu.dk/d2l/le/content/80615/viewContent/284028/View
-        sbyte[] horseMoves =
-        {
-            0x21,     // two up one right
-            0x1F,     // two up one left
-            0x12,     // one up two right
-            0x0E,     // one up two left
-            -0x21,    // two down one left
-            -0x1F,    // two down one right
-            -0x12,    // one down two left
-            -0x0E     // one down Two Right
+        static sbyte[] horseMoves ={
+                 0x21,    // two up   one Left
+                 0x1F,    // two up   one Right
+                 0x12,    // one up   two right
+                 0x0E,    // one up   two left
+                -0x21,    // two down one left
+                -0x1F,    // two down one right
+                -0x12,    // one down two left
+                -0x0E     // one down Two Right
         };
-
-        private List<Move> genHorseMoves(byte position, bool depthIs1)
+        private List<Move> genHorseMoves( GameState state , Piece piece  )
         {
+
+            byte tempPos = piece.Position;
+            bool valid;
+
             List<Move> moves = new List<Move>();
-            for (dirs = 0; dirs < horseMoves.Length; dirs++)
+            for (int i = 0; i < horseMoves.Length; i++)
             {
-                // this adds the offset 
-                tempPos = (byte)(tempPos + horseMoves[dirs]);
-
-                if (false)
-                {
-                    // IS OUT OF BOUNDS OF BOARD 
-
-                    continue;
-                }
-
-                if (false)
-                {
-                    // is blocked by self ?? 
-
-                    continue;
-                }
-
-
-                // createMove and Add to list 
-                moves.Add(new Move(position, tempPos));
+                valid = true;
+                tempPos = (byte)(piece.Position + horseMoves[i]);
+                
+                if( !Board.IsIndexValid(tempPos) )// isnot Valid
+                    break;
+            
+                if (state.State.IsFieldOccupied(tempPos))
+                    {
+                        if ( piece.isWhite() == state.State.isFieldOwnedByWhite(tempPos) )
+                        {
+                               valid = false;// if it is an enemy we want to end the loop after it is finished
+                        }
+                    }
+                    
+                if(valid)
+                    moves.Add(new Move(piece.Position, tempPos));
             }
 
             return moves;
+        
+        }
+        private List<Move> genPawnMoves(GameState state , Piece piece){
+            return new List<Move>();
         }
     }
 }
