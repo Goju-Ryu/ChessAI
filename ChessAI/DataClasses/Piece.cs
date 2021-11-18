@@ -98,18 +98,16 @@ namespace ChessAI.DataClasses
             builder.Append(
                 (PieceType) switch
                 {
-                    0 =>  this.Position.ToString("X4"),
-                    1 => "P",
-                    2 => "R",
-                    3 => "K",
-                    4 => "B",
-                    5 => "Q",
-                    6 => "K",
+                    Piece.Empty =>  this.Position.ToString("X4"),
+                    Piece.Pawn   => "P",
+                    Piece.Rook   => "R",
+                    Piece.Knight => "K",
+                    Piece.Bishop => "B",
+                    Piece.Queen  => "Q",
+                    Piece.King   => "K",
                     _ => "X"
                 }
             );
-
-            //Insert appends for other flags here as they are decided on
 
             return builder.ToString();
         }
