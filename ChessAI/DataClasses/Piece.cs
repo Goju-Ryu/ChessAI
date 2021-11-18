@@ -81,19 +81,19 @@ namespace ChessAI.DataClasses
         {
             var builder = new StringBuilder();
 
-            builder.Append((PieceFlags & White) == White ? "White" : "Black");
+            builder.Append((PieceFlags & White) == White ? "W" : "B");
             builder.Append(" ");
             builder.Append(
                 (PieceType) switch
                 {
-                    0 => "None",
-                    1 => "Pawn",
-                    2 => "Rook",
-                    3 => "Knight",
-                    4 => "Bishop",
-                    5 => "Queen",
-                    6 => "King",
-                    _ => "Invalid"
+                    0 => ".",
+                    1 => "P",
+                    2 => "R",
+                    3 => "K",
+                    4 => "B",
+                    5 => "Q",
+                    6 => "K",
+                    _ => "X"
                 }
             );
 
