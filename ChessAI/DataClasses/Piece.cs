@@ -41,6 +41,13 @@ namespace ChessAI.DataClasses
             _piece = flags;
             Position = 0xAA; // Outside valid indexes as the piece has been given no 
         }
+        
+        public Piece(int flags)
+        {
+            _piece = (byte)flags;
+            Position = 0xAA; // Outside valid indexes as the piece has been given no 
+        }
+        
         public Piece(byte flags, byte position)
         {
             _piece = flags;
