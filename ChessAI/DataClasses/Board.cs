@@ -125,5 +125,20 @@ namespace ChessAI.DataClasses {
                 _ => throw new ArgumentException("Argument must be a valid index")
             };
         }
+    
+        public override string ToString(){
+
+            String str = "{";
+            for (int i = 0; i < Fields.Length ; i++)
+            {
+                if(i % 0x10 == 0){
+                    str += "\n";
+                }else if(i % 0x08 == 0){
+                    str += "\t";
+                }
+                str += "\t" + Fields[i] .ToString();
+            }
+            return str;
+        }
     }
 }
