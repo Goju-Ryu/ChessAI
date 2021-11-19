@@ -75,8 +75,6 @@ namespace ChessAI.DataClasses
          */
         public GameState ApplyMove(Move move)
         {
-            //implementation goes here...
-
             Span<Piece> newFields = stackalloc Piece[State.Fields.Length];
             State.Fields.CopyTo(newFields);
 
@@ -85,8 +83,10 @@ namespace ChessAI.DataClasses
             var capturedPiece = newFields[move.EndPos];
             newFields[move.EndPos] = movedPiece;
 
-            var newPieceList = new Piece[6][];
-            throw new NotImplementedException();
+            //TODO use another constructor to make this implementation faster (perhaps make one that takes a span)
+            var newBoard = new Board(newFields.ToArray());
+            var newState = new GameState(newBoard);
+            return newState;
         }
     }
 }
