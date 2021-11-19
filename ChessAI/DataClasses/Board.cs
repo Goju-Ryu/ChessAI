@@ -7,7 +7,16 @@ namespace ChessAI.DataClasses
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
+        private static readonly sbyte[] Directions = {
+            +0x10, // 1 up
+            -0x10, // 1 down
+            +0x01, // 1 right
+            -0x01, // 1 left
+        };
 
+        public static sbyte WhiteDirection(Direction direction) => Directions[(byte)direction];
+        public static sbyte BlackDirection(Direction direction) => (sbyte) -(Directions[(byte)direction]);
+        
         private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
 
         /// <summary>
@@ -103,4 +112,13 @@ namespace ChessAI.DataClasses
             };
         }
     }
+    
+    public enum Direction : byte
+    {
+        Up = 0,
+        Down = 1,
+        Left = 2,
+        Right = 3,
+    };
+
 }
