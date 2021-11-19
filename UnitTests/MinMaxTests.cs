@@ -119,7 +119,7 @@ namespace UnitTests
             return new List<Move>();  //_tree[state.State].Item2.ToList();
         }
 
-        public int StaticAnalysis(GameState state)
+        public int StaticAnalysis(GameState state, bool isWhite)
         {
             return 0; //_tree[state.State].Item1;
         }

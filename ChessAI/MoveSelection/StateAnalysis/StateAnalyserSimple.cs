@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using ChessAI.DataClasses;
 
@@ -53,7 +54,7 @@ namespace ChessAI.MoveSelection.StateAnalysis
             // if black transform position to correct index index
             var index =
                 (piece.PieceFlags & Piece.White) != Piece.White
-                    ? position + 8
+                    ? IndexTransformer(position)
                     : position;
 
 
@@ -75,7 +76,10 @@ namespace ChessAI.MoveSelection.StateAnalysis
 
         // All boards are mirrored in the invalid indexes
         // This allows one to index the position value of white simply by PiecePositionPoints[index]
-        // and to access the corresponding position value of black by PiecePositionPoints[index + 8]
+        // and to access the corresponding position value of black by using the PositionConverter(int i) function.
+        
+        // Indexed from the end towards the start. Essentially ^(i + 1) == Length - (i + 1)
+        public static Index IndexTransformer(int i) => ^(i + 1); 
 
         protected static readonly int[] KingPositionPoints =
         {
