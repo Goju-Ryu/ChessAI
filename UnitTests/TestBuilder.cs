@@ -88,7 +88,7 @@ namespace UnitTests{
 
             Board board = generateEmptyBoard();
 
-            List<Piece> newPieces = new List<Piece>(board.Fields);
+            List<Piece> newPieces = new List<Piece>(board.Fields.ToArray());
             foreach(Piece piece in pieces){
                 newPieces[piece.Position] = piece;
             }

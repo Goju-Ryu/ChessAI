@@ -1,36 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 
-namespace ChessAI.DataClasses {
-    
-    
-    public enum BT : int {
-            ColA = 0x00,   
-            ColB = 0x10,   
-            ColC = 0x20,   
-            ColD = 0x30,
-            ColE = 0x40,   
-            ColF = 0x50,   
-            ColG = 0x60,   
-            ColH = 0x70,
-
-            Row1 = 0x00,   
-            Row2 = 0x01,   
-            Row3 = 0x02,   
-            Row4 = 0x03,
-            Row5 = 0x04,   
-            Row6 = 0x05,   
-            Row7 = 0x06,   
-            Row8 = 0x07
-    };
-    
+namespace ChessAI.DataClasses
+{
     public readonly struct Board
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
 
-        public readonly Piece[] Fields; //TODO consider using a Span<T> instead
+        private static readonly  ImmutableDictionary<Direction, sbyte> Directions =  new Dictionary<Direction, sbyte>()
+        {
+            { Direction.Up, +0x10 }, // 1 up
+            { Direction.Down, -0x10 }, // 1 down
+            { Direction.Right, +0x01 }, // 1 right
+            { Direction.Left, -0x01 }, // 1 left
+        }.ToImmutableDictionary();
+
+        public static sbyte WhiteDirection(Direction direction) => Directions[direction];
+        public static sbyte BlackDirection(Direction direction) => (sbyte) -Directions[direction];
+
+        private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
 
         /// <summary>
         /// A constructor taking an array of pieces representing the board. Note that the array length must
@@ -40,15 +30,16 @@ namespace ChessAI.DataClasses {
         /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
         public Board(Piece[] fields)
         {
-            if (fields.Length != (Width * Height))
+            var expectedSize = Width * Height;
+            if (fields.Length != expectedSize)
             {
                 throw new ArgumentException(
-                    "fields must be an array of length 0x" + 0x88.ToString("X") + " / 0d" + 0x88 + 
+                    "fields must be an array of length 0x" + expectedSize.ToString("X") + " / 0d" + expectedSize +
                     " but the provided array had length 0x" + fields.Length.ToString("X") + " / 0d" + fields.Length
                 );
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         /// <summary>
@@ -64,13 +55,16 @@ namespace ChessAI.DataClasses {
                 fields[piece.Position] = piece;
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         public Piece this[int i] => Fields[i];
 
-        public bool isFieldOwnedByWhite(byte position){
-            return Fields[ position ].isWhite();
+        public ReadOnlySpan<Piece> Fields => _fields.AsSpan();
+
+        public bool IsFieldOwnedByWhite(byte position)
+        {
+            return Fields[position].IsWhite;
         }
 
         public bool IsFieldOccupied(byte position)
@@ -105,14 +99,14 @@ namespace ChessAI.DataClasses {
         public static byte StringToIndex(string fieldName)
         {
             if (fieldName.Length != 2
-                || !"ABCDEFGHabcdefgh".Contains(fieldName.First())
+                || !"ABCDEFGHabcdefgh".Contains(fieldName[0])
                 || !"12345678".Contains(fieldName[1]))
             {
                 throw new ArgumentException("Argument must be a valid field name");
             }
 
             var lastDigit = Byte.Parse(fieldName.Substring(1));
-            return (fieldName.First()) switch
+            return (fieldName[0]) switch
             {
                 'A' => (byte)(0x00 + lastDigit),
                 'B' => (byte)(0x10 + lastDigit),
@@ -125,20 +119,54 @@ namespace ChessAI.DataClasses {
                 _ => throw new ArgumentException("Argument must be a valid index")
             };
         }
-    
-        public override string ToString(){
 
+        public override string ToString()
+        {
             String str = "{";
-            for (int i = 0; i < Fields.Length ; i++)
+            for (int i = 0; i < Fields.Length; i++)
             {
-                if(i % 0x10 == 0){
+                if (i % 0x10 == 0)
+                {
                     str += "\n";
-                }else if(i % 0x08 == 0){
+                }
+                else if (i % 0x08 == 0)
+                {
                     str += "\t";
                 }
-                str += "\t" + Fields[i] .ToString();
+
+                str += "\t" + Fields[i].ToString();
             }
+
             return str;
         }
     }
+
+    public enum Direction : byte
+    {
+        Up = 0,
+        Down = 1,
+        Left = 2,
+        Right = 3,
+    };
+
+    public enum BT : int
+    {
+        ColA = 0x00,
+        ColB = 0x10,
+        ColC = 0x20,
+        ColD = 0x30,
+        ColE = 0x40,
+        ColF = 0x50,
+        ColG = 0x60,
+        ColH = 0x70,
+
+        Row1 = 0x00,
+        Row2 = 0x01,
+        Row3 = 0x02,
+        Row4 = 0x03,
+        Row5 = 0x04,
+        Row6 = 0x05,
+        Row7 = 0x06,
+        Row8 = 0x07
+    };
 }

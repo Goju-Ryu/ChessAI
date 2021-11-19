@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ChessAI.DataClasses
 {
-    //todo could this be a ref struct?
     public readonly struct Piece : IEquatable<Piece>
     {
         /// <summary>
@@ -16,54 +14,65 @@ namespace ChessAI.DataClasses
         ///
         /// below is a description of the layout of _piece starting from the most significant bit
         /// towards the least significant on
-        ///
+        /// 
+        ///<code>
         ///     unused:         2 bits
         ///     challenges:     1 bit
         ///     is challenged:  1 bit
         ///     is white:       1 bit
         ///     Piece type:     3 bits
-        ///
+        ///</code>
         /// </summary>
         private readonly byte _piece;
 
+        /// <summary>
+        /// <inheritdoc cref="_piece"/>
+        /// </summary>
         public byte Content => _piece;
+
         public byte PieceFlags => (byte)(_piece & 0b1111_1000);
         public byte PieceType => (byte)(_piece & PieceMask);
-       
+
         /// <summary>
         /// The position of the piece as an index on an 0x88 board.
         /// If a position doesn't make sense or is unknown for this piece an invalid index is set instead.
         /// </summary>
         public byte Position { get; }
 
-        public Piece(byte flags)
-        {
-            _piece = flags;
-            Position = 0xAA; // Outside valid indexes as the piece has been given no 
-        }
+        /// <summary>
+        /// Base constructor with all arguments given and as the correct type
+        /// </summary>
+        /// <param name="flags">
+        /// piece type and color at minimum but may also contain other flags as described by <see cref="Content"/>.
+        /// </param>
+        /// <param name="position">An index describing the position on the board</param>
         public Piece(byte flags, byte position)
         {
             _piece = flags;
             Position = position;
         }
 
-        public Piece(int flags, byte position)
+        public Piece(byte flags) : this(flags, 0xAA)
         {
-            Position = position;
-            _piece = (byte)flags;
         }
 
-        public Piece(byte flags, int position)
+        public Piece(int flags) : this((byte)flags, 0xAA)
         {
-            Position = (byte)position;
-            _piece = flags;
         }
 
-        public Piece(int flags, int position)
+        public Piece(int flags, byte position) : this((byte)flags, position)
         {
-            Position = (byte)position;
-            _piece = (byte)flags;
         }
+
+        public Piece(byte flags, int position) : this(flags, (byte)position)
+        {
+        }
+
+        public Piece(int flags, int position) : this((byte)flags, (byte)position)
+        {
+        }
+
+
         //######################################//
         // Constants for easy use of this type  //
         //######################################//
@@ -83,11 +92,9 @@ namespace ChessAI.DataClasses
 
         // Flags
         public const byte White = 0b1000;
-        public const byte Black = 0; //TODO check this plays well with other functionality
+        public const byte Black = 0;
 
-        public bool isWhite(){
-            return (White & _piece) != 0;
-        }
+        public bool IsWhite => (White & _piece) != 0;
 
         public override string ToString()
         {
@@ -98,13 +105,13 @@ namespace ChessAI.DataClasses
             builder.Append(
                 (PieceType) switch
                 {
-                    Piece.Empty =>  this.Position.ToString("X4"),
-                    Piece.Pawn   => "P",
-                    Piece.Rook   => "R",
-                    Piece.Knight => "K",
-                    Piece.Bishop => "B",
-                    Piece.Queen  => "Q",
-                    Piece.King   => "K",
+                    Empty => Position.ToString("X4"),
+                    Pawn => "P",
+                    Rook => "R",
+                    Knight => "K",
+                    Bishop => "B",
+                    Queen => "Q",
+                    King => "K",
                     _ => "X"
                 }
             );
@@ -157,7 +164,5 @@ namespace ChessAI.DataClasses
         public static bool operator ==(Piece a, int b) => a._piece == b;
         public static bool operator !=(int a, Piece b) => a != b._piece;
         public static bool operator !=(Piece a, int b) => a._piece != b;
-
-
     }
 }
