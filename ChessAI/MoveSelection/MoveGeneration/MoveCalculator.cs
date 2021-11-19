@@ -222,8 +222,40 @@ namespace ChessAI.MoveSelection.MoveGeneration
             return moves;
         
         }
+        
+        // TODO REMOVE HARD CODING. 
+        private static byte[] PawnsOrigPosition = new byte[]{
+                0x10 ,
+                0x11 ,
+                0x12 ,
+                0x13 ,
+                0x14 ,
+                0x15 ,
+                0x16 ,
+                0x17,
+            
+                0x60 ,
+                0x61 ,
+                0x62 ,
+                0x63 ,
+                0x64 ,
+                0x65 ,
+                0x66 ,
+                0x67
+        };
+
+
         private List<Move> genPawnMoves(GameState state , Piece piece){
-            return new List<Move>();
+            /*
+            bool isForwaard = true;
+            int startIndex = isForwaard ? 0x10 : 0x60 ;
+
+            bool isStartPosition(bool isFwrd , int startI ){
+                    if
+            }
+
+            return new List<Move>();*/
+            return null;
         }
     }
 }

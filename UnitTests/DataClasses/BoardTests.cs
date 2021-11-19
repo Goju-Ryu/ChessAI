@@ -36,7 +36,7 @@ namespace UnitTests.DataClasses
         [Test]
         public void LookUpTests(){
             
-            Piece[] pieceArr = {
+            Piece[] pieces = {
                 new Piece(  Piece.Pawn   & Piece.Black   ,   (int)BT.ColA + (int)BT.Row2   ),
                 new Piece(  Piece.Pawn   & Piece.Black   ,   (int)BT.ColB + (int)BT.Row2   ),
                 new Piece(  Piece.Pawn   & Piece.Black   ,   (int)BT.ColC + (int)BT.Row2   ),
@@ -73,7 +73,6 @@ namespace UnitTests.DataClasses
                 new Piece(  Piece.Knight & Piece.White   ,   (int)BT.ColG + (int)BT.Row8   ),
                 new Piece(  Piece.Rook   & Piece.White   ,   (int)BT.ColH + (int)BT.Row8   )
             };
-            List<Piece> pieces = new List<Piece>(pieceArr);
             
             List<int> list = new List<int>(); 
             foreach(Piece q in pieces)

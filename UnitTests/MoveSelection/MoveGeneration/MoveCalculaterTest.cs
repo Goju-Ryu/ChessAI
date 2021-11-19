@@ -78,7 +78,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             obstructions.Add( new byte[3]{0x34 , 0x54, 0x45}       );
             obstructions.Add( new byte[4]{0x34 , 0x54, 0x45, 0x43} );
 
-                                        // 0  1    2  3  4
+                                          // 0      1       2       3       4
             int[] exspectedMoves =      {   14,     10 ,    7,      4,      0 };
             int[] exspectedMovesENEMY = {   14,     11 ,    9,      7,      4 };
 
@@ -225,7 +225,32 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
         [Test]
         public void PawnMoves(){
-            Assert.True(false);
+            
+
+            bool isPositiveDirection = true;
+
+            List<Piece> pieces = new List<Piece>();
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x10 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x11 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x12 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x13 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x14 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x15 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x16 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x17 ) );
+            
+            Board board = TestBuilder.GenerateBoard(pieces);
+            GameState state = new GameState(board);
+
+            Console.WriteLine(board);
+
+            MoveCalculator MC = new MoveCalculator();
+            List<Move> moves = MC.CalculatePossibleMoves(state, true);
+
+            
+
+
+            Assert.AreEqual(moves.Count, 2);
         }
 
         
