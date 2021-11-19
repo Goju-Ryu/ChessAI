@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ChessAI.DataClasses
 {
-    //todo could this be a ref struct?
     public readonly struct Piece : IEquatable<Piece>
     {
         /// <summary>
@@ -76,7 +74,7 @@ namespace ChessAI.DataClasses
 
         // Flags
         public const byte White = 0b1000;
-        public const byte Black = 0; //TODO check this plays well with other functionality
+        public const byte Black = 0;
 
 
         public override string ToString()

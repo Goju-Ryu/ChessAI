@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
@@ -23,7 +21,10 @@ namespace ChessAI.DataClasses
         /// </remarks>
         public GameState(Board board)
         {
-            var tempBoardFields = board.Fields; 
+            State = board;
+            
+            Span<Piece> tempBoardFields = stackalloc Piece[State.Fields.Length];
+            State.Fields.CopyTo(tempBoardFields);
             
             List<Piece> tempWhitePieceList = new List<Piece>();
             List<Piece> tempBlackPieceList = new List<Piece>();
@@ -36,7 +37,7 @@ namespace ChessAI.DataClasses
                 if (!Board.IsIndexValid(index)) continue; 
 
                 var currentPiece = board[index];
-                if (currentPiece != Empty)
+                if (currentPiece.PieceType != Empty)
                 {
                     
                     // If the found piece doesn't have the right position then set it 
@@ -57,11 +58,10 @@ namespace ChessAI.DataClasses
                 }
             }
 
-            State = new Board(tempBoardFields);
+            State = new Board(tempBoardFields.ToArray());
             WhitePieces = tempWhitePieceList.ToArray();
             BlackPieces = tempBlackPieceList.ToArray();
         }
-
 
         public readonly Board State;
         public readonly Piece[] WhitePieces;
@@ -77,8 +77,8 @@ namespace ChessAI.DataClasses
         {
             //implementation goes here...
 
-            var newFields = new Piece[State.Fields.Length];
-            State.Fields.CopyTo(newFields, 0);
+            Span<Piece> newFields = stackalloc Piece[State.Fields.Length];
+            State.Fields.CopyTo(newFields);
 
             var movedPiece = newFields[move.StartPos];
             newFields[move.StartPos] = new Piece(Empty);

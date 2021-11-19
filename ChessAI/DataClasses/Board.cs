@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChessAI.DataClasses
 {
@@ -9,7 +8,7 @@ namespace ChessAI.DataClasses
         private const byte Width = 0x10;
         private const byte Height = 0x8;
 
-        public readonly Piece[] Fields; //TODO consider using a Span<T> instead
+        private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
 
         /// <summary>
         /// A constructor taking an array of pieces representing the board. Note that the array length must
@@ -19,15 +18,16 @@ namespace ChessAI.DataClasses
         /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
         public Board(Piece[] fields)
         {
-            if (fields.Length != (Width * Height))
+            var expectedSize = Width * Height;
+            if (fields.Length != expectedSize)
             {
                 throw new ArgumentException(
-                    "fields must be an array of length 0x" + 0x88.ToString("X") + " / 0d" + 0x88 + 
+                    "fields must be an array of length 0x" + expectedSize.ToString("X") + " / 0d" + expectedSize + 
                     " but the provided array had length 0x" + fields.Length.ToString("X") + " / 0d" + fields.Length
                 );
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         /// <summary>
@@ -43,10 +43,12 @@ namespace ChessAI.DataClasses
                 fields[piece.Position] = piece;
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         public Piece this[int i] => Fields[i];
+
+        public ReadOnlySpan<Piece> Fields => _fields.AsSpan();
 
         public bool IsFieldOccupied(byte position)
         {
@@ -80,14 +82,14 @@ namespace ChessAI.DataClasses
         public static byte StringToIndex(string fieldName)
         {
             if (fieldName.Length != 2
-                || !"ABCDEFGHabcdefgh".Contains(fieldName.First())
+                || !"ABCDEFGHabcdefgh".Contains(fieldName[0])
                 || !"12345678".Contains(fieldName[1]))
             {
                 throw new ArgumentException("Argument must be a valid field name");
             }
 
             var lastDigit = Byte.Parse(fieldName.Substring(1));
-            return (fieldName.First()) switch
+            return (fieldName[0]) switch
             {
                 'A' => (byte)(0x00 + lastDigit),
                 'B' => (byte)(0x10 + lastDigit),
