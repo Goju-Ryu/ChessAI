@@ -62,6 +62,8 @@ namespace ChessAI.MoveSelection.MoveGeneration
             Direction dir;
 
             List<Move> moves = new List<Move>();
+            
+            // Create a function that returns the correct offsets to use for the given color
             Func<Direction, sbyte> directionGetter = piece.IsWhite ? Board.WhiteDirection : Board.BlackDirection;
 
             for (byte dirs = 0; dirs < 4; dirs++)
@@ -111,8 +113,11 @@ namespace ChessAI.MoveSelection.MoveGeneration
             byte tempPos;
 
             List<Move> moves = new List<Move>();
+            
+            // Create a function that returns the correct offsets to use for the given color
             Func<Direction, sbyte> directionGetter = piece.IsWhite ? Board.WhiteDirection : Board.BlackDirection;
 
+            // Create an array of all the offsets for moving diagonally
             sbyte[] dirs = new[]
             {
                 (sbyte)(directionGetter(Direction.Up) + directionGetter(Direction.Left)),
