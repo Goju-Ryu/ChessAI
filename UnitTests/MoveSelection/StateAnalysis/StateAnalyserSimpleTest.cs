@@ -64,7 +64,7 @@ namespace UnitTests.MoveSelection.StateAnalysis
                 if (!Board.IsIndexValid(i)) continue;
                 
                 whitePoints.Add(positionPoints[i]);
-                blackPoints.Add(positionPoints[^(i + 1)]); // Indexed from the end towards the start. Essentially ^(i + 1) == Length - (i + 1)
+                blackPoints.Add(positionPoints[IndexTransformer(i)]); 
             }
             
             Assert.AreEqual(whitePoints.Count, blackPoints.Count);
@@ -83,7 +83,7 @@ namespace UnitTests.MoveSelection.StateAnalysis
                 if (!Board.IsIndexValid(i)) continue;
                
                 Assert.DoesNotThrow(() => positionPoints.GetValue(i), "Invalid index ({0:X}) for white", i);
-                Assert.DoesNotThrow(() => positionPoints.GetValue(i + 8), "Invalid index ({0:X}) for black", i);
+                Assert.DoesNotThrow(() => positionPoints.GetValue(IndexTransformer(i).Value), "Invalid index ({0:X}) for black", i);
             }
         }
     }
