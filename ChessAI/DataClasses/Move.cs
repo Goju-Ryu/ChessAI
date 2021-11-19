@@ -1,4 +1,5 @@
 using System;
+using static ChessAI.DataClasses.MoveType;
 using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
@@ -7,7 +8,7 @@ namespace ChessAI.DataClasses
     {
         public readonly byte StartPos;
         public readonly byte EndPos;
-        public readonly bool IsSpecialMove; //TODO consider using an enum to describe the type of move instead
+        public readonly MoveType MoveType;
         public readonly Piece MovePiece;
         public readonly Piece TargetPiece;
 
@@ -24,13 +25,13 @@ namespace ChessAI.DataClasses
         /// required fields in the correct way only given start and end position and a state.
         /// </remarks>
         [ObsoleteAttribute("When encountered it should be replaced by a factory method call."
-        + "The CreateSimpleMove Factory is the recommended alternative.", false)]
+                           + "The CreateSimpleMove Factory is the recommended alternative.", false)]
         public Move(byte startPos, byte endPos)
         {
             StartPos = startPos;
             EndPos = endPos;
 
-            IsSpecialMove = false;
+            MoveType = Ordinary;
             MovePiece = new Piece(Empty);
             TargetPiece = MovePiece;
         }
@@ -43,11 +44,11 @@ namespace ChessAI.DataClasses
         /// <param name="isSpecialMove"></param>
         /// <param name="movePiece"></param>
         /// <param name="targetPiece"></param>
-        private Move(byte startPos, byte endPos, bool isSpecialMove, Piece movePiece, Piece targetPiece)
+        private Move(byte startPos, byte endPos, MoveType moveType, Piece movePiece, Piece targetPiece)
         {
             StartPos = startPos;
             EndPos = endPos;
-            IsSpecialMove = isSpecialMove;
+            MoveType = moveType;
             MovePiece = movePiece;
             TargetPiece = targetPiece;
         }
@@ -63,7 +64,7 @@ namespace ChessAI.DataClasses
         {
             var movePiece = state.State[startPos];
             var targetPiece = state.State[endPos];
-            var move = new Move(startPos, endPos, false, movePiece, targetPiece);
+            var move = new Move(startPos, endPos, Ordinary, movePiece, targetPiece);
             return move;
         }
 
@@ -89,7 +90,7 @@ namespace ChessAI.DataClasses
             var kingIndex = (targetPiece.PieceFlags & White) == White ? whiteKingIndex : blackKingIndex;
             var movePiece = state.State[kingIndex];
 
-            var move = new Move(kingIndex, castlePosition, true, movePiece, targetPiece);
+            var move = new Move(kingIndex, castlePosition, Castling, movePiece, targetPiece);
             return move;
         }
 
@@ -112,8 +113,29 @@ namespace ChessAI.DataClasses
             GameState state)
         {
             var movePiece = state.State[startPosition];
-            var move = new Move(startPosition, endPos, true, movePiece, promotionPiece);
+            var promotionType = promotionPiece.PieceType switch
+            {
+                Queen => PromotionQueen,
+                Knight => PromotionKnight,
+                Bishop => PromotionBishop,
+                Rook => PromotionRook,
+                _ => throw new ArgumentOutOfRangeException(
+                    $"The piece type {promotionPiece.PieceType} is not an option for promotion"
+                )
+            };
+
+            var move = new Move(startPosition, endPos, promotionType, movePiece, promotionPiece);
             return move;
         }
+    }
+
+    public enum MoveType : byte
+    {
+        Ordinary,
+        Castling,
+        PromotionQueen,
+        PromotionRook,
+        PromotionBishop,
+        PromotionKnight
     }
 }
