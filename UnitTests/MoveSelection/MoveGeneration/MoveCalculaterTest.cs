@@ -293,10 +293,6 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
         }
 
-
-
-
-
         [Test]
         public void testConvertion(){
             
