@@ -33,11 +33,14 @@ namespace ChessAI.DataClasses
         public byte PieceFlags => (byte)(_piece & 0b1111_1000);
         public byte PieceType => (byte)(_piece & PieceMask);
 
+        
+
         /// <summary>
         /// The position of the piece as an index on an 0x88 board.
         /// If a position doesn't make sense or is unknown for this piece an invalid index is set instead.
         /// </summary>
         public byte Position { get; }
+        public bool beenMoved => (_piece & beenMovedFlag) != 0;
 
         /// <summary>
         /// Base constructor with all arguments given and as the correct type
@@ -52,25 +55,15 @@ namespace ChessAI.DataClasses
             Position = position;
         }
 
-        public Piece(byte flags) : this(flags, 0xAA)
-        {
-        }
+        public Piece(byte flags) : this(flags, 0xAA){}
 
-        public Piece(int flags) : this((byte)flags, 0xAA)
-        {
-        }
+        public Piece(int flags) : this((byte)flags, 0xAA){}
 
-        public Piece(int flags, byte position) : this((byte)flags, position)
-        {
-        }
+        public Piece(int flags, byte position) : this((byte)flags, position){}
 
-        public Piece(byte flags, int position) : this(flags, (byte)position)
-        {
-        }
+        public Piece(byte flags, int position) : this(flags, (byte)position){}
 
-        public Piece(int flags, int position) : this((byte)flags, (byte)position)
-        {
-        }
+        public Piece(int flags, int position) : this((byte)flags, (byte)position){}
 
 
         //######################################//
@@ -81,18 +74,22 @@ namespace ChessAI.DataClasses
         public const byte PieceMask = 0b0111;
 
         // Piece definitions
-        public const byte Pawn = 0b0001;
-        public const byte Rook = 0b0010;
+        public const byte Pawn   = 0b0001;
+        public const byte Rook   = 0b0010;
         public const byte Knight = 0b0011;
         public const byte Bishop = 0b0100;
-        public const byte Queen = 0b0101;
-        public const byte King = 0b0110;
+        public const byte Queen  = 0b0101;
+        public const byte King   = 0b0110;
 
         public const byte NumOfTypes = 6;
 
         // Flags
         public const byte White = 0b1000;
         public const byte Black = 0;
+
+        // movedFlad
+        public const byte beenMovedFlag = 0b0001_0000;
+
 
         public bool IsWhite => (White & _piece) != 0;
 

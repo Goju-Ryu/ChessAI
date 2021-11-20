@@ -9,8 +9,12 @@ namespace ChessAI.DataClasses
      * A struct that keeps track of all relevant information about a game
      * </summary>
      */
-    public readonly struct GameState
+
+    public readonly partial struct GameState
     {
+        public readonly bool[] hasWhiteTowersMoved;
+        public readonly bool[] hasBlackTowersMoved;
+
         /// <summary>
         /// An easy to use constructor taking only a board.
         /// </summary>
@@ -61,6 +65,10 @@ namespace ChessAI.DataClasses
             State = new Board(tempBoardFields.ToArray());
             WhitePieces = tempWhitePieceList.ToArray();
             BlackPieces = tempBlackPieceList.ToArray();
+
+            // BOOLS
+            hasWhiteTowersMoved = new bool[]{false, false};
+            hasBlackTowersMoved = new bool[]{false, false};
         }
 
         public readonly Board State;
@@ -78,15 +86,27 @@ namespace ChessAI.DataClasses
             Span<Piece> newFields = stackalloc Piece[State.Fields.Length];
             State.Fields.CopyTo(newFields);
 
-            var movedPiece = newFields[move.StartPos];
+            Piece movedPiece = newFields[move.StartPos];
             newFields[move.StartPos] = new Piece(Empty);
-            var capturedPiece = newFields[move.EndPos];
-            newFields[move.EndPos] = movedPiece;
+            Piece capturedPiece = newFields[move.EndPos];
+            newFields[move.EndPos] = new Piece(movedPiece.PieceFlags ^ Piece.beenMovedFlag, move.EndPos) ;
 
             //TODO use another constructor to make this implementation faster (perhaps make one that takes a span)
             var newBoard = new Board(newFields.ToArray());
             var newState = new GameState(newBoard);
+
             return newState;
         }
+    
     }
 }
+
+
+
+
+
+
+
+
+    
+    
