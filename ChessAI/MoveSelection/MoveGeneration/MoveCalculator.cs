@@ -5,57 +5,26 @@ using System;
 
 namespace ChessAI.MoveSelection.MoveGeneration
 {
-    public enum DirectionIndex
-    {
-        Up = 0,
-        Down = 1,
-        Left = 2,
-        Right = 3,
-        UpLeft = 4,
-        DownRight = 5,
-        UpRight = 7,
-        DownLeft = 8
-    };
-
-
     // Moves Implementation 
     public class MoveCalculator : IMoveCalculator
     {
-        //public enum DirectionIndex {
-        //Up = 0, Down = 1, Left = 2, Right = 3,
-        //UpLeft = 4, DownRight=5, UpRight=7, DownLeft=8};
-
-        // this is made to fit this Direction Index. 
-
-        public static readonly sbyte[] X80Dirs =
-        {
-            +0x10, // 1 up     0 x
-            -0x10, // 1 down   0 x
-            +0x01, // 0 x      1 right
-            -0x01, // 0 x      1 left
-            +0x11, // 1 up     1 left
-            -0x11, // 1 down   1 right 
-            +0x0f, // 1 up     1 right
-            -0x0f  // 1 down   1 left 
-        };
-
         public List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite)
         {
             List<Move> moves = new List<Move>();
 
 
             //Piece[] pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
-            Piece[] pieces = state.State.Fields;
+            Piece[] pieces = state.State.Fields.ToArray();
 
             foreach (Piece piece in pieces)
             {
-                moves.AddRange(calcMovesForPiece(state,piece));
+                moves.AddRange(CalcMovesForPiece(state,piece));
             }
 
             return moves;
         }
 
-        public List<Move> calcMovesForPiece(GameState state,Piece piece)
+        public List<Move> CalcMovesForPiece(GameState state,Piece piece)
         {
             bool king  = (piece == Piece.King); // Also used as single distance boolean
             bool queen = (piece == Piece.Queen);
@@ -68,13 +37,13 @@ namespace ChessAI.MoveSelection.MoveGeneration
             if (king || queen || piece.PieceType == Piece.Rook)
             {
                 //Console.WriteLine("LINES  ");
-                moves.AddRange(genLineMoves( state , piece , king ));
+                moves.AddRange(GenLineMoves( state , piece , king ));
             }
 
             if (king || queen || piece.PieceType == Piece.Bishop)
             {
                 //Console.WriteLine("DIAG   ");
-                moves.AddRange(genDiagMoves( state , piece , king ));
+                moves.AddRange(GenDiagMoves( state , piece , king ));
             }
 
             if( piece.PieceType == Piece.Knight){
@@ -90,24 +59,28 @@ namespace ChessAI.MoveSelection.MoveGeneration
             return moves;
         }
 
-        private List<Move> genLineMoves(GameState state , Piece piece , bool depthIs1)
+        private List<Move> GenLineMoves(GameState state , Piece piece , bool depthIs1)
         {
             bool moreMoves = true;
-            byte dirs;
             byte tempPos;
+            Direction dir;
 
             List<Move> moves = new List<Move>();
-            moreMoves = true;
+            
+            // Create a function that returns the correct offsets to use for the given color
+            Func<Direction, sbyte> directionGetter = piece.IsWhite ? Board.WhiteDirection : Board.BlackDirection;
 
-            for (dirs = 0; dirs < 4; dirs++)
+            for (byte dirs = 0; dirs < 4; dirs++)
             {
                 tempPos = piece.Position;
                 moreMoves = true;
+                dir = (Direction)dirs;
 
                 while (moreMoves)
                 {
+                    
                     // this adds the offset 
-                    tempPos = (byte)(tempPos + X80Dirs[dirs]);
+                    tempPos = (byte)(tempPos + directionGetter(dir));
                     if (!(Board.IsIndexValid(tempPos)))
                     {
                         break;
@@ -116,7 +89,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
                     if (state.State.IsFieldOccupied(tempPos))
                     {
-                        if ( piece.isWhite() != state.State.isFieldOwnedByWhite(tempPos) )
+                        if ( piece.IsWhite != state.State.IsFieldOwnedByWhite(tempPos) )
                         {
                             moreMoves = false; // if it is an enemy we want to end the loop after it is finished
                         }
@@ -137,17 +110,27 @@ namespace ChessAI.MoveSelection.MoveGeneration
             
             return moves;
         }
-        private List<Move> genDiagMoves( GameState state , Piece piece , bool depthIs1)
+        private List<Move> GenDiagMoves( GameState state , Piece piece , bool depthIs1)
         {
 
             bool moreMoves = true;
-            byte dirs;
             byte tempPos;
 
             List<Move> moves = new List<Move>();
-            moreMoves = true;
+            
+            // Create a function that returns the correct offsets to use for the given color
+            Func<Direction, sbyte> directionGetter = piece.IsWhite ? Board.WhiteDirection : Board.BlackDirection;
 
-            for (dirs = 4; dirs < 8; dirs++)
+            // Create an array of all the offsets for moving diagonally
+            sbyte[] dirs = new[]
+            {
+                (sbyte)(directionGetter(Direction.Up) + directionGetter(Direction.Left)),
+                (sbyte)(directionGetter(Direction.Up) + directionGetter(Direction.Right)),
+                (sbyte)(directionGetter(Direction.Down) + directionGetter(Direction.Left)),
+                (sbyte)(directionGetter(Direction.Down) + directionGetter(Direction.Right)),
+            };
+                
+            foreach (sbyte dir in dirs)
             {
                 tempPos = piece.Position;
                 moreMoves = true;
@@ -155,7 +138,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 while (moreMoves)
                 {
                     // this adds the offset 
-                    tempPos = (byte)(tempPos + X80Dirs[dirs]);
+                    tempPos = (byte)(tempPos + dir);
                     if (!(Board.IsIndexValid(tempPos)))
                     {
                         break;
@@ -164,7 +147,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
                     if (state.State.IsFieldOccupied(tempPos))
                     {
-                        if ( piece.isWhite() != state.State.isFieldOwnedByWhite(tempPos) )
+                        if ( piece.IsWhite != state.State.IsFieldOwnedByWhite(tempPos) )
                         {
                             moreMoves = false; // if it is an enemy we want to end the loop after it is finished
                         }
@@ -213,7 +196,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
             
                 if (state.State.IsFieldOccupied(tempPos))
                     {
-                        if ( piece.isWhite() == state.State.isFieldOwnedByWhite(tempPos) )
+                        if ( piece.IsWhite == state.State.IsFieldOwnedByWhite(tempPos) )
                         {
                                valid = false;// if it is an enemy we want to end the loop after it is finished
                         }
@@ -264,7 +247,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                         moves.Add(     new Move(piece.Position,pos)     ); // ONLY IF ISENT OCCUPIED
                 }else{
                     // DIAGONAL LINE 
-                    if(     board.IsFieldOccupied(pos) && board.isFieldOwnedByWhite(pos) && !piece.isWhite()  )// ONLY IF DIAGONAL IS OCCUPIED BY ENEMY
+                    if(     board.IsFieldOccupied(pos) && board.IsFieldOwnedByWhite(pos) && !piece.IsWhite  )// ONLY IF DIAGONAL IS OCCUPIED BY ENEMY
                         moves.Add(     new Move(piece.Position,pos)     );
                 }                
             }

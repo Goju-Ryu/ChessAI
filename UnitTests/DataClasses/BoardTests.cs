@@ -2,7 +2,7 @@ using ChessAI.DataClasses;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 
 namespace UnitTests.DataClasses
@@ -84,7 +84,7 @@ namespace UnitTests.DataClasses
                 Console.WriteLine(" location given is  :" + q);
 
 
-            Board b = new Board(pieces);
+            Board b = new Board(pieces.ToList());
 
             int[] columns ={
                 (int)BT.ColA,

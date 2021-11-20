@@ -88,7 +88,7 @@ namespace UnitTests{
 
             Board board = generateEmptyBoard();
 
-            List<Piece> newPieces = new List<Piece>(board.Fields);
+            List<Piece> newPieces = new List<Piece>(board.Fields.ToArray() );
             Assert.AreEqual(newPieces.Count , 0x80);
             
             foreach(Piece piece in pieces){
