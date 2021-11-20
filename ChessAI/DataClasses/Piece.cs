@@ -40,7 +40,7 @@ namespace ChessAI.DataClasses
         /// If a position doesn't make sense or is unknown for this piece an invalid index is set instead.
         /// </summary>
         public byte Position { get; }
-        public bool beenMoved => (_piece & beenMovedFlag) != 0;
+        public bool hasMoved => (_piece & beenMovedFlag) != 0;
 
         /// <summary>
         /// Base constructor with all arguments given and as the correct type

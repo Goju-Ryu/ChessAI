@@ -6,7 +6,7 @@ using System;
 namespace ChessAI.MoveSelection.MoveGeneration
 {
     // Moves Implementation 
-    public class MoveCalculator : IMoveCalculator
+    public partial class MoveCalculator : IMoveCalculator
     {
         public List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite)
         {
@@ -265,6 +265,62 @@ namespace ChessAI.MoveSelection.MoveGeneration
             return moves ; 
         }
 
+        private partial List<Move> getSpecialMoves(GameState state, Piece piece);    
+        private static partial void init();
+    }
+
+    public partial class MoveCalculator : IMoveCalculator
+    {
+
+        // A list of Functions, Functions take a Gamestate, and a Piece, and returns a Fcuntion that returns a gmaestate
+        //static List< Func< GameState , Piece, Func<GameState?> >> specialRule = new List<Func<GameState, Piece, Func<GameState?>>>();
+        
+
+        GameState? enPassant(GameState state, Piece pawn){
+            return null;
+        }
+
+        GameState? CastleSideQueen_LEFT(GameState state, Piece piece){
+            
+            bool isPos = Board.isDIrectionPositive(piece);
+            int left   = isPos? 0x00 : Board.PositionConverter(0x00);
+            int off    = 2; // distance to nearest Royal Piece; 
+            
+            if( (!state.State[left].hasMoved) &&  (!state.State[left + off].hasMoved)  )    // if both pieces Has Not moved
+                for (int i = 1; i < off; i++)                                               // for each piece between them, the area must be of type empty. 
+                    if( state.State[left + i].PieceType != Piece.Empty )
+                        return returnNull();
+                
+            return Create_SwitchPlaces( state, piece , state.State[left + off] ) ;
+        }
+
+        GameState? CastleSideKing_Right(GameState state, Piece piece){
+            
+            bool isPos = Board.isDIrectionPositive(piece);
+            int right  = isPos? 0x07 : Board.PositionConverter(0x07);
+            int off    = 2; // distance to nearest Royal Piece; 
+            
+            if( (!state.State[right].hasMoved) &&  (!state.State[right - off].hasMoved)  )    // if both pieces Has Not moved
+                for (int i = 1; i < off; i++)                                               // for each piece between them, the area must be of type empty. 
+                    if( state.State[right + i].PieceType != Piece.Empty )
+                        return returnNull();
+                
+            return Create_SwitchPlaces( state, piece , state.State[right - off] ) ;
+        }
+
+        GameState? PawnPromotion(GameState state, Piece pawn){
+            return null;
+        }
+
+        // ###################################### //
+        //      Internal Return Delegates         // 
+        // ###################################### //
+        
+        GameState? returnNull(){ return null; }
+        
+        GameState? Create_SwitchPlaces(GameState state, Piece p1, Piece p2){ return null; }
+
+        GameState? Create_NewPlace(GameState state, Piece p1, Piece p2){ return null; }
         
     }
 }
