@@ -13,8 +13,8 @@ namespace ChessAI.MoveSelection.MoveGeneration
             List<Move> moves = new List<Move>();
 
 
-            //Piece[] pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
-            Piece[] pieces = state.State.Fields.ToArray();
+            Piece[] pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
+            //Piece[] pieces = state.State.Fields.ToArray();
 
             foreach (Piece piece in pieces)
             {
@@ -24,7 +24,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
             return moves;
         }
 
-        public List<Move> CalcMovesForPiece(GameState state,Piece piece)
+        public List<Move> CalcMovesForPiece(GameState state,Piece piece )
         {
             bool king  = (piece == Piece.King); // Also used as single distance boolean
             bool queen = (piece == Piece.Queen);

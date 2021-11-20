@@ -5,6 +5,7 @@ using NUnit.Framework;
 using ChessAI.DataClasses;
 using ChessAI.MoveSelection.MoveGeneration;
 
+
 namespace UnitTests.MoveSelection.MoveGeneration {
     public class MoveCalculaterTest {
         
@@ -24,7 +25,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 Board board = TestBuilder.GenerateBoard(pieces) ;
                 GameState state = new GameState(board);
                 MoveCalculator MC = new MoveCalculator();
-                List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
                 Assert.AreEqual( exspectedNum,moves.Count );
 
@@ -65,7 +66,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 GameState state = new GameState(board);
                 MoveCalculator MC = new MoveCalculator();
 
-                List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
                 Console.Write(board + "\n\n\n");
                 Assert.AreEqual( exspectedNum , moves.Count );
@@ -107,7 +108,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 GameState state = new GameState(board);
                 MoveCalculator MC = new MoveCalculator();
 
-                List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
                 Assert.AreEqual( exspectedNum , moves.Count );
             }
@@ -151,7 +152,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 GameState state = new GameState(board);
                 MoveCalculator MC = new MoveCalculator();
 
-                List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
                 Console.Write(board + "\n\n\n");
                 Assert.AreEqual( exspectedNum , moves.Count );
@@ -195,7 +196,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 GameState state = new GameState(board);
                 MoveCalculator MC = new MoveCalculator();
 
-                List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
                 Console.Write(board + "\n\n\n");
                 Assert.AreEqual( exspectedNum , moves.Count );
@@ -232,7 +233,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             MoveCalculator MC;
             List<Move> moves ;
 
-            void test(byte color , int exspected, byte Row ){
+            void test(byte color , int exspected, byte Row , bool isWhite){
                 pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x00 ) );
                 pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x01 ) );
                 pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x02 ) );
@@ -246,24 +247,53 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 state = new GameState(board);
 
                 MC = new MoveCalculator();
-                moves = MC.CalculatePossibleMoves(state, true);
+                moves = MC.CalculatePossibleMoves(state, isWhite);
 
                 Console.WriteLine(board);
                 Assert.AreEqual(exspected,moves.Count);
             }
 
             Console.WriteLine("TEST 1");
-            test(Piece.White, 16, 0x10);
+            test(Piece.White, 16, 0x10, true);
             Console.WriteLine("TEST 2");
-            test(Piece.Black, 8 , 0x10);
+            test(Piece.Black, 8 , 0x10, false);
 
             pieces.Clear();
 
             Console.WriteLine("TEST 3");
-            test(Piece.Black, 16, 0x60);
+            test(Piece.Black, 16, 0x60, false);
             Console.WriteLine("TEST 4");
-            test(Piece.White, 8 , 0x60);
+            test(Piece.White, 8 , 0x60, true);
         }
+
+        [Test]
+        public void PawnMoves_02 (){
+
+            List<Piece> pieces = new List<Piece>();
+            Board board;
+            GameState state;
+            MoveCalculator MC;
+            List<Move> moves ;
+
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black, 0x43 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ Piece.White, 0x34 ) );
+            
+            board = TestBuilder.GenerateBoard(pieces);
+            state = new GameState(board);
+
+            MC = new MoveCalculator();
+
+            moves = MC.CalculatePossibleMoves(state, false);
+            moves.AddRange( MC.CalculatePossibleMoves(state, true) );
+            //Assert.AreEqual(2,moves.Count);
+
+
+            Console.WriteLine(board);
+       
+
+        }
+
+
 
 
 
