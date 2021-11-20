@@ -86,19 +86,21 @@ namespace ChessAI.DataClasses
         public const byte Black = 0; //TODO check this plays well with other functionality
 
         public bool isWhite(){
-            return (White & _piece) != 0;
+            return ( White & _piece ) != 0;
         }
 
         public override string ToString()
         {
             var builder = new StringBuilder();
 
-            builder.Append((PieceFlags & White) == White ? "W" : "B");
+            if( this.PieceType == Piece.Empty)
+                return  this.Position.ToString("X4");
+
+            builder.Append( this.isWhite() ? "W" : "B" );
             builder.Append(" ");
             builder.Append(
                 (PieceType) switch
                 {
-                    Piece.Empty =>  this.Position.ToString("X4"),
                     Piece.Pawn   => "P",
                     Piece.Rook   => "R",
                     Piece.Knight => "K",

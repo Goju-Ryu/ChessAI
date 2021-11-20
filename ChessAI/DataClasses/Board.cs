@@ -140,5 +140,15 @@ namespace ChessAI.DataClasses {
             }
             return str;
         }
+    
+        public static byte PositionConverter(byte pos){
+            int xPos = 0x80 - pos - 0x09;
+            return (byte) xPos;
+        }
+
+        // TODO DOUBLE CHECK THIS IS CORRECT 
+        public static bool isDIrectionPositive(Piece piece){
+            return piece.isWhite();
+        }
     }
 }

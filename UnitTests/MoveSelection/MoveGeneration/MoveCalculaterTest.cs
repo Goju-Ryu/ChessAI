@@ -224,35 +224,104 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         }
 
         [Test]
-        public void PawnMoves(){
-            
-
-            bool isPositiveDirection = true;
+        public void PawnMoves_01 (){
 
             List<Piece> pieces = new List<Piece>();
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x10 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x11 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x12 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x13 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x14 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x15 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x16 ) );
-            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x17 ) );
-            
-            Board board = TestBuilder.GenerateBoard(pieces);
-            GameState state = new GameState(board);
+            Board board;
+            GameState state;
+            MoveCalculator MC;
+            List<Move> moves ;
 
-            Console.WriteLine(board);
+            void test(byte color , int exspected, byte Row ){
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x00 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x01 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x02 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x03 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x04 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x05 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x06 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x07 ) );
+                
+                board = TestBuilder.GenerateBoard(pieces);
+                state = new GameState(board);
 
-            MoveCalculator MC = new MoveCalculator();
-            List<Move> moves = MC.CalculatePossibleMoves(state, true);
+                MC = new MoveCalculator();
+                moves = MC.CalculatePossibleMoves(state, true);
 
-            
+                Console.WriteLine(board);
+                Assert.AreEqual(exspected,moves.Count);
+            }
 
+            Console.WriteLine("TEST 1");
+            test(Piece.White, 16, 0x10);
+            Console.WriteLine("TEST 2");
+            test(Piece.Black, 8 , 0x10);
 
-            Assert.AreEqual(moves.Count, 2);
+            pieces.Clear();
+
+            Console.WriteLine("TEST 3");
+            test(Piece.Black, 16, 0x60);
+            Console.WriteLine("TEST 4");
+            test(Piece.White, 8 , 0x60);
         }
 
-        
+
+
+        [Test]
+        public void testConvertion(){
+            
+            List<(int,int)> convertions = new List<(int, int)>();
+            int Row1 = 0x00; 
+            int Row2 = 0x70;
+            int RowOffset = 0x10;
+
+            for (int i = 0; i < 7; i++)
+            {
+                Row1 += RowOffset; Row2 -= RowOffset;
+                convertions.Add( ( Row1 + 0, Row2 + 7 ) );
+                convertions.Add( ( Row1 + 1, Row2 + 6 ) );
+                convertions.Add( ( Row1 + 2, Row2 + 5 ) );
+                convertions.Add( ( Row1 + 3, Row2 + 4 ) );
+                convertions.Add( ( Row1 + 4, Row2 + 3 ) );
+                convertions.Add( ( Row1 + 5, Row2 + 2 ) );
+                convertions.Add( ( Row1 + 6, Row2 + 1 ) );
+                convertions.Add( ( Row1 + 7, Row2 + 0 ) );
+            }
+            
+            convertions.Add( ( 0x11 , 0x66 ) );
+            convertions.Add( ( 0x16 , 0x61 ) );
+
+            testConverstions(convertions);
+            void testConverstions(List<(int,int)> list){
+            
+                List<Piece> pieces = new List<Piece>();
+                foreach ((int,int) I in list)
+                {
+                    CheckReversedPosition(I.Item1, I.Item2);
+                    pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , I.Item1                 ) );
+                    pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , I.Item2                 ) );
+                }
+
+                //List<int> temp = new List<int>();
+                void CheckReversedPosition( int pos , int ePos ){
+                    int temp;
+                    for (int q= 0; q < 2; q++)
+                    {
+                        temp = pos; pos = ePos; ePos = temp;
+                        for (int i = 0; i < convertions.Count ; i++)
+                        {
+                            int CONV = Board.PositionConverter((byte)pos);
+                            pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , pos   ) );
+                            pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , CONV                    ) );
+                            Assert.AreEqual(  CONV  ,   ePos    );
+                        }
+                    }
+                }
+
+                Board board = TestBuilder.GenerateBoard(pieces);
+                Console.WriteLine("BOARD \n" + board);
+
+            }           
+        }
     }
 }

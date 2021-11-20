@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using ChessAI.DataClasses;
 using System;
 
+
 namespace ChessAI.MoveSelection.MoveGeneration
 {
     public enum DirectionIndex
@@ -60,27 +61,30 @@ namespace ChessAI.MoveSelection.MoveGeneration
             bool queen = (piece == Piece.Queen);
 
             List<Move> moves = new List<Move>();
+            if(  piece.PieceType == 0 ){
+                return moves;
+            }
 
-            if (king || queen || piece == Piece.Rook)
+            if (king || queen || piece.PieceType == Piece.Rook)
             {
                 //Console.WriteLine("LINES  ");
                 moves.AddRange(genLineMoves( state , piece , king ));
             }
 
-            if (king || queen || piece == Piece.Bishop)
+            if (king || queen || piece.PieceType == Piece.Bishop)
             {
                 //Console.WriteLine("DIAG   ");
                 moves.AddRange(genDiagMoves( state , piece , king ));
             }
 
-            if( piece == Piece.Knight){
+            if( piece.PieceType == Piece.Knight){
                 //Console.WriteLine("KNIGHT ");
                 moves.AddRange(genHorseMoves(state, piece));
             }
 
-            if( piece == Piece.Pawn){
-                //Console.WriteLine("PAWN   ");
-                moves.AddRange(genHorseMoves(state, piece));
+            if( piece.PieceType == Piece.Pawn){
+//                Console.WriteLine("PAWN   ");
+                moves.AddRange(genPawnMoves(state, piece));
             }
 
             return moves;
@@ -224,38 +228,60 @@ namespace ChessAI.MoveSelection.MoveGeneration
         }
         
         // TODO REMOVE HARD CODING. 
-        private static byte[] PawnsOrigPosition = new byte[]{
-                0x10 ,
-                0x11 ,
-                0x12 ,
-                0x13 ,
-                0x14 ,
-                0x15 ,
-                0x16 ,
-                0x17,
-            
-                0x60 ,
-                0x61 ,
-                0x62 ,
-                0x63 ,
-                0x64 ,
-                0x65 ,
-                0x66 ,
-                0x67
-        };
-
+        private static byte[,] PawnsOrigPosition = new byte[,]{
+            {0x10 ,0x11 ,0x12 ,0x13 ,0x14 ,0x15 ,0x16 ,0x17},
+            {0x60 ,0x61 ,0x62 ,0x63 ,0x64 ,0x65 ,0x66 ,0x67}
+        };        
 
         private List<Move> genPawnMoves(GameState state , Piece piece){
-            /*
-            bool isForwaard = true;
-            int startIndex = isForwaard ? 0x10 : 0x60 ;
+            
+            List<Move> moves = new List<Move>();            
+            bool isLowIndexed   = Board.isDIrectionPositive(piece);
+            int  startIndex     = isLowIndexed ? 0x10: 0x60  ; // START INDEX IS LOW IF WHITE 
 
-            bool isStartPosition(bool isFwrd , int startI ){
-                    if
+            int a               = piece.Position - startIndex ;
+            bool StartPosition  = (a >= 0 && a < 0x08)? true: false;
+            
+            int posDoubleDelta  = isLowIndexed ? 0x20 : -0x20;
+            int[] posDelta      = isLowIndexed ? new int[]{ 0x10 , 0x11 , (0x10 - 0x01) } : new int[]{ - 0x10 , - 0x11 , - (0x10 - 0x01) };
+            int[] moveArr       = StartPosition ? new int[]{ // if start position then the length of possible places should be 4
+                piece.Position + posDelta[0],
+                piece.Position + posDelta[1],
+                piece.Position + posDelta[2],
+                piece.Position + posDoubleDelta,
+            }:
+            new int[]{   // if not the first move, then possible moves are just 3. 
+                piece.Position + posDelta[0],
+                piece.Position + posDelta[1],
+                piece.Position + posDelta[2]
+            };   
+            
+            void validatePosition(byte pos , Piece piece, Board board){
+                // diagonal Move
+                if(  Math.Abs ( pos - piece.Position ) % 0x10 == 0 ){
+                    // STRAIGHT LINE 
+                    if(    !board.IsFieldOccupied(pos)  )
+                        moves.Add(     new Move(piece.Position,pos)     ); // ONLY IF ISENT OCCUPIED
+                }else{
+                    // DIAGONAL LINE 
+                    if(     board.IsFieldOccupied(pos) && board.isFieldOwnedByWhite(pos) && !piece.isWhite()  )// ONLY IF DIAGONAL IS OCCUPIED BY ENEMY
+                        moves.Add(     new Move(piece.Position,pos)     );
+                }                
             }
 
-            return new List<Move>();*/
-            return null;
+            for (int i = 0; i < moveArr.Length; i++)
+            {
+                // TODO change to Board Max FIeld OR SOMETHING
+                if((byte) moveArr[i] == 255 ){ 
+                    break;
+                }
+
+                validatePosition( (byte) moveArr[i],   piece,  state.State );
+            }
+
+            return moves ; 
         }
+
+        
     }
 }
