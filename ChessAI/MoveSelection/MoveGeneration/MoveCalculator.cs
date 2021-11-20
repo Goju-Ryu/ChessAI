@@ -100,7 +100,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     }
 
                     // createMove and Add to list 
-                    moves.Add(new Move(piece.Position, tempPos));
+                    moves.Add( Move.CreateSimpleMove(piece.Position, tempPos, state));
 
                     // for all directions. First 4, up down left right.  
                     if (depthIs1)
@@ -158,7 +158,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     }
 
                     // createMove and Add to list 
-                    moves.Add(new Move(piece.Position, tempPos));
+                    moves.Add( Move.CreateSimpleMove(piece.Position, tempPos, state));
 
                     // for all directions. First 4, up down left right.  
                     if (depthIs1)
@@ -203,7 +203,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     }
                     
                 if(valid)
-                    moves.Add(new Move(piece.Position, tempPos));
+                    moves.Add( Move.CreateSimpleMove(piece.Position, tempPos, state));
             }
 
             return moves;
@@ -244,11 +244,11 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 if(  Math.Abs ( pos - piece.Position ) % 0x10 == 0 ){
                     // STRAIGHT LINE 
                     if(    !board.IsFieldOccupied(pos)  )
-                        moves.Add(     new Move(piece.Position,pos)     ); // ONLY IF ISENT OCCUPIED
+                        moves.Add(     Move.CreateSimpleMove(piece.Position,pos,state)     ); // ONLY IF ISENT OCCUPIED
                 }else{
                     // DIAGONAL LINE 
                     if(     board.IsFieldOccupied(pos) && board.IsFieldOwnedByWhite(pos) && !piece.IsWhite  )// ONLY IF DIAGONAL IS OCCUPIED BY ENEMY
-                        moves.Add(     new Move(piece.Position,pos)     );
+                        moves.Add(     Move.CreateSimpleMove(piece.Position,pos, state)     );
                 }                
             }
 

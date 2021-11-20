@@ -47,15 +47,15 @@ namespace UnitTests.DataClasses
         {
             var state0 = new GameState(new Board(new[] { _rook, _pawn, _queen }.ToList()));
 
-            var move1 = new Move(0x20, 0x22);
+            var move1 = Move.CreateSimpleMove(0x20, 0x22, state0);
             var state1 = state0.ApplyMove(move1);
 
-            var move2 = new Move(move1.EndPos, move1.StartPos);
+            var move2 = Move.CreateSimpleMove(move1.EndPos, move1.StartPos, state1);
             var state2 = state1.ApplyMove(move2);
             
             AssertStatesDeepEqual(state0, state2);
 
-            var move3 = new Move(move2.EndPos, _rook.Position);
+            var move3 = Move.CreateSimpleMove(move2.EndPos, _rook.Position, state2);
             var state3 = state2.ApplyMove(move3);
             
             Assert.AreEqual(1, state3.WhitePieces.Length);
