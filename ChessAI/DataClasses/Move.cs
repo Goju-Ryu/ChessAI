@@ -104,12 +104,8 @@ namespace ChessAI.DataClasses
         public static Move CreateCastleMove(byte castlePosition, GameState state)
         {
             var targetPiece = state.State[castlePosition];
-
-            // Dependant on the board. Should this be a static member of board?
-            byte whiteKingIndex = 0x04;
-            byte blackKingIndex = 0x73;
-
-            var kingIndex = (targetPiece.PieceFlags & White) == White ? whiteKingIndex : blackKingIndex;
+            
+            var kingIndex = Board.StartPositions[targetPiece.ColorAndType][0];
             var movePiece = state.State[kingIndex];
 
             var move = new Move(kingIndex, castlePosition, Castling, movePiece, new Piece(Empty));

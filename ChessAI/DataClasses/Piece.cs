@@ -27,6 +27,8 @@ namespace ChessAI.DataClasses
         public byte Content => _piece;
         public byte PieceFlags => (byte)(_piece & 0b1111_1000);
         public byte PieceType => (byte)(_piece & PieceMask);
+        public byte ColorAndType => (byte)(_piece & 0x0f);
+        public bool IsWhite => (PieceFlags & White) == White;
        
         /// <summary>
         /// The position of the piece as an index on an 0x88 board.

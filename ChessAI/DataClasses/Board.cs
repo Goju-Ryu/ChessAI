@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
 {
@@ -13,6 +15,23 @@ namespace ChessAI.DataClasses
             +0x01, // 1 right
             -0x01, // 1 left
         };
+
+        public static readonly ImmutableDictionary<byte, byte[]> StartPositions = new Dictionary<byte, byte[]>()
+        {
+            { White | Pawn, new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17   } },
+            { White | Rook, new byte[] { 0x00, 0x07 } },
+            { White | Knight, new byte[] { 0x01, 0x06 } },
+            { White | Bishop, new byte[] { 0x02, 0x05 } },
+            { White | Queen, new byte[] { 0x03 } },
+            { White | King, new byte[] { 0x04 } },
+            
+            { Black | Pawn, new byte[] { 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67   } },
+            { Black | Rook, new byte[] { 0x70, 0x77 } },
+            { Black | Knight, new byte[] { 0x71, 0x76 } },
+            { Black | Bishop, new byte[] { 0x72, 0x75 } },
+            { Black | Queen, new byte[] { 0x74 } },
+            { Black | King, new byte[] { 0x73 } }
+        }.ToImmutableDictionary();
 
         public static sbyte WhiteDirection(Direction direction) => Directions[(byte)direction];
         public static sbyte BlackDirection(Direction direction) => (sbyte) -(Directions[(byte)direction]);
