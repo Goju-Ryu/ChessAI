@@ -275,52 +275,105 @@ namespace ChessAI.MoveSelection.MoveGeneration
         // A list of Functions, Functions take a Gamestate, and a Piece, and returns a Fcuntion that returns a gmaestate
         //static List< Func< GameState , Piece, Func<GameState?> >> specialRule = new List<Func<GameState, Piece, Func<GameState?>>>();
         
+/*
+        GameState? enPassant(GameState state, Piece piece){
 
-        GameState? enPassant(GameState state, Piece pawn){
-            return null;
-        }
-
-        GameState? CastleSideQueen_LEFT(GameState state, Piece piece){
-            
             bool isPos = Board.isDIrectionPositive(piece);
-            int left   = isPos? 0x00 : Board.PositionConverter(0x00);
-            int off    = 2; // distance to nearest Royal Piece; 
-            
-            if( (!state.State[left].hasMoved) &&  (!state.State[left + off].hasMoved)  )    // if both pieces Has Not moved
-                for (int i = 1; i < off; i++)                                               // for each piece between them, the area must be of type empty. 
-                    if( state.State[left + i].PieceType != Piece.Empty )
-                        return returnNull();
-                
-            return Create_SwitchPlaces( state, piece , state.State[left + off] ) ;
-        }
+            (int, int) offsets = isPos ? (0x11, 0x10 - 0x01) : ( - 0x11, -(0x10 - 0x01));
 
-        GameState? CastleSideKing_Right(GameState state, Piece piece){
+            // LEFT;
+            if( Board.IsIndexValid(  (byte)(piece.Position + offsets.Item1)     )) // IS THE DIAGONAL FORWRD LEFT A VALID INDEX  
+                if( state.State[piece.Position - 1].PieceType == Piece.Pawn &&     state.State[piece.Position - 1].IsWhite != piece.IsWhite )      // IS THE SPACE LEFT OF PIECE OCCUPIED BY AN ENEMY PAWN?  
+                    // TODO CREATE MOVE OR GAME STATE
+
+            // LEFT;
+            if( Board.IsIndexValid(  (byte)(piece.Position + offsets.Item1)     )) // IS THE DIAGONAL FORWRD LEFT A VALID INDEX  
+                if( state.State[piece.Position + 1].PieceType == Piece.Pawn &&     state.State[piece.Position - 1].IsWhite != piece.IsWhite )      // IS THE SPACE LEFT OF PIECE OCCUPIED BY AN ENEMY PAWN?  
+                    // TODO CREATE MOVE OR GAME STATE
+       
+            // RETURN SOMETHING?!
+        }
+        */
+
+
+        // MAKE CASTLE MOVES FOR TOWERS AND ROYALS. s
+        List<Move> CastleSide(GameState state, Piece piece){
             
+            // in the corners 
+            List<Move> moves = new List<Move>();
+
+            bool isTower = ( piece.PieceType == Piece.Rook );           // BREAK IF NOT- POSSIBLE 
+            bool isKing =  ( piece.PieceType == Piece.King );
+            if (    !( isTower || isKing)     )               
+                return null;
+            
+            bool isPos = Board.isDIrectionPositive(piece);              // TO CHECK FOR CASTLE MOVES WE MUST KNOW WICH SIDE OF THE BOARD TO LOOK FOR PIECES 
+            int left   = isPos? 0x00 : Board.PositionConverter(0x00);   // the moveis only possible if the tower and king has not been moved, so assuming starting posionts    
+            int right  = isPos? 0x07 : Board.PositionConverter(0x07); 
+            int kingPosition = isPos ? 0x04: Board.PositionConverter(0x04);
+
+            if(state.State[kingPosition].hasMoved)
+                return moves;
+            
+
+            bool LEFT_POSSIBLE = ( state.State[left].hasMoved  );
+            bool RIGHT_POSSIBLE = ( state.State[right].hasMoved  );
+
+            int RookPos ;
+            int RoyalPos;
+            
+            // CHECKING LEFT STATICLY 
+            if(LEFT_POSSIBLE)
+                LEFT_POSSIBLE = 
+                (state.State[left + 1].PieceType == Piece.Empty) && 
+                (state.State[left + 2].PieceType == Piece.Empty) && 
+                (state.State[left + 3].PieceType == Piece.Empty) ;
+            if(LEFT_POSSIBLE)
+            {
+                RookPos = isPos ?  0x03 : Board.PositionConverter(0x03) ;
+                RoyalPos= isPos ?  0x02 : Board.PositionConverter(0x02) ;
+                if( !(state.State[left].hasMoved || state.State[kingPosition].hasMoved) )
+                    moves.Add( Move.CreateMoveTwoPieces(   
+                        (byte)RookPos,(byte)RoyalPos,
+                        state.State[left], state.State[kingPosition], 
+                        state ) );
+            }
+
+            // CHECKING RIGHT STATICALLY 
+            if(RIGHT_POSSIBLE)
+                RIGHT_POSSIBLE = 
+                (state.State[right - 1].PieceType == Piece.Empty) && 
+                (state.State[right - 2].PieceType == Piece.Empty) ;
+            if(RIGHT_POSSIBLE)
+            {
+                RookPos = isPos ?  0x05 : Board.PositionConverter(0x05) ;
+                RoyalPos= isPos ?  0x06 : Board.PositionConverter(0x06) ;
+                if( !(state.State[right].hasMoved || state.State[0x04].hasMoved) )
+                    moves.Add( Move.CreateMoveTwoPieces(
+                        (byte)RookPos,(byte)RoyalPos,
+                        state.State[left], state.State[kingPosition],
+                        state ) );
+            }
+                
+
+            return moves;
+        }
+        /*
+        GameState? PawnPromotion(GameState state, Piece piece){
+
             bool isPos = Board.isDIrectionPositive(piece);
-            int right  = isPos? 0x07 : Board.PositionConverter(0x07);
-            int off    = 2; // distance to nearest Royal Piece; 
-            
-            if( (!state.State[right].hasMoved) &&  (!state.State[right - off].hasMoved)  )    // if both pieces Has Not moved
-                for (int i = 1; i < off; i++)                                               // for each piece between them, the area must be of type empty. 
-                    if( state.State[right + i].PieceType != Piece.Empty )
-                        return returnNull();
-                
-            return Create_SwitchPlaces( state, piece , state.State[right - off] ) ;
-        }
+            (int, int) offsets = isPos ? (0x11, 0x10 - 0x01) : ( - 0x11, -(0x10 - 0x01));
 
-        GameState? PawnPromotion(GameState state, Piece pawn){
-            return null;
-        }
+            // LEFT;
+            if( Board.IsIndexValid(  (byte)(piece.Position + offsets.Item1)     )) // IS THE DIAGONAL FORWRD LEFT A VALID INDEX  
+                if( state.State[piece.Position - 1].PieceType == Piece.Pawn &&     state.State[piece.Position - 1].IsWhite != piece.IsWhite )      // IS THE SPACE LEFT OF PIECE OCCUPIED BY AN ENEMY PAWN?  
+                    // TODO CREATE MOVE OR GAME STATE
 
-        // ###################################### //
-        //      Internal Return Delegates         // 
-        // ###################################### //
-        
-        GameState? returnNull(){ return null; }
-        
-        GameState? Create_SwitchPlaces(GameState state, Piece p1, Piece p2){ return null; }
+            // LEFT;
+            if( Board.IsIndexValid(  (byte)(piece.Position + offsets.Item1)     )) // IS THE DIAGONAL FORWRD LEFT A VALID INDEX  
+                if( state.State[piece.Position + 1].PieceType == Piece.Pawn &&     state.State[piece.Position - 1].IsWhite != piece.IsWhite )      // IS THE SPACE LEFT OF PIECE OCCUPIED BY AN ENEMY PAWN?  
+                    // TODO CREATE MOVE OR GAME STATE
 
-        GameState? Create_NewPlace(GameState state, Piece p1, Piece p2){ return null; }
-        
+        }*/
     }
 }
