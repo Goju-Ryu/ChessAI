@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Collections;
-using ChessAI;
-using ChessAI.DataClasses;
+﻿using ChessAI.DataClasses;
 
 namespace ChessAI{
 	class Program {

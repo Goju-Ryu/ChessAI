@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ChessAI.DataClasses
 {
-    //todo could this be a ref struct?
     public readonly struct Piece : IEquatable<Piece>
     {
         /// <summary>
@@ -29,6 +27,8 @@ namespace ChessAI.DataClasses
         public byte Content => _piece;
         public byte PieceFlags => (byte)(_piece & 0b1111_1000);
         public byte PieceType => (byte)(_piece & PieceMask);
+        public byte ColorAndType => (byte)(_piece & 0x0f);
+        public bool IsWhite => (PieceFlags & White) == White;
        
         /// <summary>
         /// The position of the piece as an index on an 0x88 board.
@@ -41,6 +41,13 @@ namespace ChessAI.DataClasses
             _piece = flags;
             Position = 0xAA; // Outside valid indexes as the piece has been given no 
         }
+        
+        public Piece(int flags)
+        {
+            _piece = (byte)flags;
+            Position = 0xAA; // Outside valid indexes as the piece has been given no 
+        }
+        
         public Piece(byte flags, byte position)
         {
             _piece = flags;
@@ -69,7 +76,7 @@ namespace ChessAI.DataClasses
 
         // Flags
         public const byte White = 0b1000;
-        public const byte Black = 0; //TODO check this plays well with other functionality
+        public const byte Black = 0;
 
 
         public override string ToString()

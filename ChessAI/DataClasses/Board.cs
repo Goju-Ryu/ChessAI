@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
+using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
 {
@@ -8,8 +9,34 @@ namespace ChessAI.DataClasses
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
+        private static readonly sbyte[] Directions = {
+            +0x10, // 1 up
+            -0x10, // 1 down
+            +0x01, // 1 right
+            -0x01, // 1 left
+        };
 
-        public readonly Piece[] Fields; //TODO consider using a Span<T> instead
+        public static readonly ImmutableDictionary<byte, byte[]> StartPositions = new Dictionary<byte, byte[]>()
+        {
+            { White | Pawn, new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17   } },
+            { White | Rook, new byte[] { 0x00, 0x07 } },
+            { White | Knight, new byte[] { 0x01, 0x06 } },
+            { White | Bishop, new byte[] { 0x02, 0x05 } },
+            { White | Queen, new byte[] { 0x03 } },
+            { White | King, new byte[] { 0x04 } },
+            
+            { Black | Pawn, new byte[] { 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67   } },
+            { Black | Rook, new byte[] { 0x70, 0x77 } },
+            { Black | Knight, new byte[] { 0x71, 0x76 } },
+            { Black | Bishop, new byte[] { 0x72, 0x75 } },
+            { Black | Queen, new byte[] { 0x74 } },
+            { Black | King, new byte[] { 0x73 } }
+        }.ToImmutableDictionary();
+
+        public static sbyte WhiteDirection(Direction direction) => Directions[(byte)direction];
+        public static sbyte BlackDirection(Direction direction) => (sbyte) -(Directions[(byte)direction]);
+        
+        private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
 
         /// <summary>
         /// A constructor taking an array of pieces representing the board. Note that the array length must
@@ -19,15 +46,16 @@ namespace ChessAI.DataClasses
         /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
         public Board(Piece[] fields)
         {
-            if (fields.Length != 0x88)
+            var expectedSize = Width * Height;
+            if (fields.Length != expectedSize)
             {
                 throw new ArgumentException(
-                    "fields must be an array of length 0x" + 0x88.ToString("X") + " / 0d" + 0x88 + 
+                    "fields must be an array of length 0x" + expectedSize.ToString("X") + " / 0d" + expectedSize + 
                     " but the provided array had length 0x" + fields.Length.ToString("X") + " / 0d" + fields.Length
                 );
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         /// <summary>
@@ -43,10 +71,12 @@ namespace ChessAI.DataClasses
                 fields[piece.Position] = piece;
             }
 
-            Fields = fields;
+            _fields = fields;
         }
 
         public Piece this[int i] => Fields[i];
+
+        public ReadOnlySpan<Piece> Fields => _fields.AsSpan();
 
         public bool IsFieldOccupied(byte position)
         {
@@ -80,14 +110,14 @@ namespace ChessAI.DataClasses
         public static byte StringToIndex(string fieldName)
         {
             if (fieldName.Length != 2
-                || !"ABCDEFGHabcdefgh".Contains(fieldName.First())
+                || !"ABCDEFGHabcdefgh".Contains(fieldName[0])
                 || !"12345678".Contains(fieldName[1]))
             {
                 throw new ArgumentException("Argument must be a valid field name");
             }
 
             var lastDigit = Byte.Parse(fieldName.Substring(1));
-            return (fieldName.First()) switch
+            return (fieldName[0]) switch
             {
                 'A' => (byte)(0x00 + lastDigit),
                 'B' => (byte)(0x10 + lastDigit),
@@ -101,4 +131,13 @@ namespace ChessAI.DataClasses
             };
         }
     }
+    
+    public enum Direction : byte
+    {
+        Up = 0,
+        Down = 1,
+        Left = 2,
+        Right = 3,
+    };
+
 }
