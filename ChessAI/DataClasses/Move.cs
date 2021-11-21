@@ -6,11 +6,11 @@ namespace ChessAI.DataClasses
 {
     public readonly struct Move
     {
+        public readonly Piece MovePiece;
+        public readonly Piece TargetPiece;
         public readonly byte StartPos;
         public readonly byte EndPos;
         public readonly MoveType MoveType;
-        public readonly Piece MovePiece;
-        public readonly Piece TargetPiece;
 
 
         /// <summary>
@@ -39,11 +39,11 @@ namespace ChessAI.DataClasses
         /// <summary>
         /// A constructor that takes all the required parameters to define a move
         /// </summary>
-        /// <param name="startPos"></param>
-        /// <param name="endPos"></param>
-        /// <param name="isSpecialMove"></param>
-        /// <param name="movePiece"></param>
-        /// <param name="targetPiece"></param>
+        /// <param name="startPos">The starting position of the moving piece</param>
+        /// <param name="endPos">The destination of the moving piece</param>
+        /// <param name="moveType">The type of move, designating which, if any, special rules are used</param>
+        /// <param name="movePiece">The moving piece</param>
+        /// <param name="targetPiece">The piece to be captured if any</param>
         private Move(byte startPos, byte endPos, MoveType moveType, Piece movePiece, Piece targetPiece)
         {
             StartPos = startPos;
@@ -69,6 +69,28 @@ namespace ChessAI.DataClasses
         }
 
         /// <summary>
+        /// A factory method that creates an en peasant move.
+        /// This method performs no checks on the legality of the move, not even if the pieces required are
+        /// actually there. This method should therefore only be called after the legality has been determined.
+        /// </summary>
+        /// <param name="startPos">The position from which the movePiece originates</param>
+        /// <param name="enemyPos">The position of the pawn to be captured en peasant</param>
+        /// <param name="state">The state of the game at the time of the move</param>
+        /// <returns>A new move from startPos to endPos, that also captures the enemy pawn it passes</returns>
+        public static Move CreateEnPeasantMove(byte startPos, byte enemyPos, GameState state)
+        {
+            var movePiece = state.State[startPos];
+            var enemyPiece = state.State[enemyPos];
+            var enemyDirection = (enemyPiece.PieceFlags & White) == White
+                ? Board.WhiteDirection(Direction.Up)
+                : Board.BlackDirection(Direction.Up);
+            var endPos = (byte)(enemyPos - enemyDirection);
+            
+            var move = new Move(startPos, endPos, EnPeasant, movePiece, enemyPiece);
+            return move;
+        }
+
+        /// <summary>
         /// A factory method that creates a castling move.
         /// This method performs no checks on the legality of the move, not even if the pieces required are
         /// actually there. This method should therefore only be called after the legality has been determined.
@@ -90,7 +112,7 @@ namespace ChessAI.DataClasses
             var kingIndex = (targetPiece.PieceFlags & White) == White ? whiteKingIndex : blackKingIndex;
             var movePiece = state.State[kingIndex];
 
-            var move = new Move(kingIndex, castlePosition, Castling, movePiece, targetPiece);
+            var move = new Move(kingIndex, castlePosition, Castling, movePiece, new Piece(Empty));
             return move;
         }
 
@@ -132,6 +154,7 @@ namespace ChessAI.DataClasses
     public enum MoveType : byte
     {
         Ordinary,
+        EnPeasant,
         Castling,
         PromotionQueen,
         PromotionRook,
