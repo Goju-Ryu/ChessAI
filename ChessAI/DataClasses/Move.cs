@@ -145,6 +145,16 @@ namespace ChessAI.DataClasses
             var move = new Move(startPosition, endPos, promotionType, movePiece, promotionPiece);
             return move;
         }
+
+        public static Move Parse(string moveString, GameState state)
+        {
+            //TODO implement more exhaustive analysis of moveString
+
+            var startPos = Board.StringToIndex(moveString.Substring(0, 2));
+            var endPos = Board.StringToIndex(moveString.Substring(2, 2));
+
+            return CreateSimpleMove(startPos, endPos, state);
+        }
     }
 
     public enum MoveType : byte
