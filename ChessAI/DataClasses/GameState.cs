@@ -84,6 +84,10 @@ namespace ChessAI.DataClasses
             CanHRankRookCastle = canHRankRookCastle;
         }
 
+        public static GameState CreateNewGameState()
+        {
+            throw new NotImplementedException();
+        }
 
         public readonly Board State;
         public readonly Piece[] WhitePieces;

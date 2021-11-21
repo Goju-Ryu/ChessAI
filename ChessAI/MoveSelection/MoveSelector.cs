@@ -107,7 +107,7 @@ namespace ChessAI.MoveSelection
         {
             if (searchDepth <= currentDepth)
             {
-                return _stateAnalyser.StaticAnalysis(state);
+                return _stateAnalyser.StaticAnalysis(state, _isWhite);
             }
 
             // Generate moves, sort them and remove the previous best move to avoid
