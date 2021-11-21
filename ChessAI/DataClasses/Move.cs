@@ -1,6 +1,8 @@
 using System;
 using static ChessAI.DataClasses.MoveType;
 using static ChessAI.DataClasses.Piece;
+using System.Collections.Generic;
+using ChessAI.DataClasses;
 
 namespace ChessAI.DataClasses
 {
@@ -127,6 +129,112 @@ namespace ChessAI.DataClasses
             var move = new Move(startPosition, endPos, promotionType, movePiece, promotionPiece);
             return move;
         }
+    }
+
+
+    public readonly struct Move2{
+        public readonly byte StartPos;
+        public readonly byte EndPos;
+        public readonly MoveType MoveType;
+        public readonly Piece MovePiece;
+        public readonly Piece TargetPiece;
+
+        public delegate List<Piece> PerformMove( Move2 move ,List<Piece> pieces );
+        public readonly PerformMove DelegatedMethod;
+
+        private Move2(byte startPos, byte endPos, MoveType moveType, Piece movePiece, Piece targetPiece, PerformMove delegatedMethod)
+        {
+            DelegatedMethod = delegatedMethod;
+            StartPos = startPos;
+            EndPos = endPos;
+            MoveType = moveType;
+            MovePiece = movePiece;
+            TargetPiece = targetPiece;
+        }
+
+        public static Move2 CreateSimpleMove(byte startPos, byte endPos, GameState state){
+            var movePiece   = state.State[startPos];
+            var targetPiece = state.State[endPos];
+            var move = new Move2(startPos, endPos, MoveType.Ordinary, movePiece, targetPiece, Move2.DelegateRegularMove );
+            return move;
+        }
+
+        public static Move2 CreateCastleMove(byte rookPos, byte royalPos, GameState state){
+            var movePiece   = state.State[rookPos];
+            var targetPiece = state.State[royalPos];
+            var move = new Move2(rookPos, royalPos, MoveType.Ordinary, movePiece, targetPiece, Move2.DelegateCastleMove );
+            return move;
+        }
+
+        public static Move2 CreateAnPassantMove(byte startPos, byte endPos, GameState state){
+            var movePiece   = state.State[startPos];
+            var targetPiece = state.State[endPos];
+            var move = new Move2(startPos, endPos, MoveType.Ordinary, movePiece, targetPiece, Move2.DelegateAnPassant );
+            return move;
+        }
+
+        
+
+        public List<Piece> applyMove( List<Piece> pieces ){
+            return DelegatedMethod(this,pieces);
+        }
+
+        private static List<Piece> DelegateRegularMove(Move2 move, List<Piece> pieces){
+
+            /* 
+                public readonly byte StartPos; // rookPos
+                public readonly byte EndPos;   // royalPos
+                public readonly MoveType MoveType;
+                public readonly Piece MovePiece;
+                public readonly Piece TargetPiece;
+            */
+            
+
+
+
+            Piece current;
+            current = pieces[move.StartPos];
+            pieces[move.StartPos] = new Piece( Piece.Empty , move.StartPos );
+            pieces[move.EndPos] = new Piece( current.PieceFlags ^ current.PieceType, move.EndPos); 
+            return pieces;
+        }
+
+        private static List<Piece> DelegateCastleMove(Move2 move, List<Piece> pieces){
+            
+            // GET POSITIONS AND RENAME THEM FOR THIS SCENARIO 
+            byte rookPosition = move.StartPos;
+            byte royalPosition= move.EndPos;
+
+
+            // CREATE OFFSETS FOR ROOK AND THE ROYAL
+            bool left = (rookPosition - royalPosition) < 0 ;
+            int offRoyal = left ? -2:2;
+            int Dst = Math.Abs(rookPosition - royalPosition);
+            int offRook = left ? Dst:-Dst;
+            
+            // CREATE PIECES 
+            bool isMovePieceRook = ( move.MovePiece.PieceType == Piece.Rook) ? true: false;
+            Piece ROOK = isMovePieceRook ? 
+                ( new Piece(move.MovePiece.PieceType   ^ move.MovePiece.PieceFlags   , rookPosition + offRook) ) : 
+                ( new Piece(move.TargetPiece.PieceType ^ move.TargetPiece.PieceFlags , rookPosition + offRook) ) ; 
+
+            Piece ROYAL = isMovePieceRook ? 
+                ( new Piece(move.TargetPiece.PieceType ^ move.TargetPiece.PieceFlags , rookPosition + offRoyal) ) : 
+                ( new Piece(move.MovePiece.PieceType   ^ move.MovePiece.PieceFlags   , rookPosition + offRoyal) ) ; 
+
+            pieces[rookPosition]  = new Piece(Piece.Empty, rookPosition  );
+            pieces[royalPosition] = new Piece(Piece.Empty, royalPosition );
+            pieces[rookPosition + offRoyal] = ROYAL;
+            pieces[rookPosition + offRoyal] = ROOK ;
+        }
+
+        private static List<Piece> DelegateAnPassant(Move2 move, List<Piece> pieces){
+            
+        }
+
+
+
+      
     }
 
     public enum MoveType : byte
