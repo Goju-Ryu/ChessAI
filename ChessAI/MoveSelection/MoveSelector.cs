@@ -75,7 +75,7 @@ namespace ChessAI.MoveSelection
          * If there is no max depth, set this argument to -1;
          * </param>
          */
-        public Move BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = -1)
+        public Move BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = int.MaxValue)
         {
             var task = Task.Run(() =>
             {
