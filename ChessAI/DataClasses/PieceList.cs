@@ -7,6 +7,9 @@ namespace ChessAI.DataClasses
         private readonly Span<Piece> _pieces;
         public ReadOnlySpan<Piece> Pieces => _pieces;
 
+        public Piece this[int i] => Pieces[i];
+        public int Length => Pieces.Length;
+
         public PieceList(Span<Piece> pieces)
         {
             _pieces = pieces;

@@ -32,14 +32,14 @@ namespace UnitTests.DataClasses
            AssertStatesDeepEqual(stateFromFields, stateFromPieces);
            
            Assert.AreEqual(1, stateFromFields.BlackPieces.Length);
-           Assert.Contains(_queen, stateFromFields.BlackPieces);
-           Assert.Contains(_queen, stateFromPieces.BlackPieces);
+           Assert.Contains(_queen, stateFromFields.BlackPieces.Pieces.ToArray());
+           Assert.Contains(_queen, stateFromPieces.BlackPieces.Pieces.ToArray());
            
            Assert.AreEqual(2, stateFromPieces.WhitePieces.Length);
-           Assert.Contains(_rook, stateFromFields.WhitePieces);
-           Assert.Contains(_rook, stateFromPieces.WhitePieces);
-           Assert.Contains(_pawn, stateFromFields.WhitePieces);
-           Assert.Contains(_pawn, stateFromPieces.WhitePieces);
+           Assert.Contains(_rook, stateFromFields.WhitePieces.Pieces.ToArray());
+           Assert.Contains(_rook, stateFromPieces.WhitePieces.Pieces.ToArray());
+           Assert.Contains(_pawn, stateFromFields.WhitePieces.Pieces.ToArray());
+           Assert.Contains(_pawn, stateFromPieces.WhitePieces.Pieces.ToArray());
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace UnitTests.DataClasses
             var state3 = state2.ApplyMove(move3);
             
             Assert.AreEqual(1, state3.WhitePieces.Length);
-            Assert.Contains(_pawn, state3.WhitePieces);
+            Assert.Contains(_pawn, state3.WhitePieces.Pieces.ToArray());
         }
 
 

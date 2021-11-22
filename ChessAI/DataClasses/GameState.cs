@@ -17,6 +17,10 @@ namespace ChessAI.DataClasses
         /// An easy to use constructor taking only a board.
         /// </summary>
         /// <param name="board">The board that should be represented by this state</param>
+        /// <param name="isWhite">a boolean deciding if the Ai is playing as white</param>
+        /// <param name="lastMove">The move performed last</param>
+        /// <param name="canARankRookCastle">A boolean representing the possibility of castling in the A rank</param>
+        /// <param name="canHRankRookCastle">A boolean representing the possibility of castling in the H rank</param>
         /// <remarks>
         /// This implementation is slow as it has to construct a PieceList itself.
         /// Use other constructors in time critical sections of code.
@@ -62,22 +66,18 @@ namespace ChessAI.DataClasses
             }
 
             State = new Board(tempBoardFields.ToArray());
-            WhitePieces = tempWhitePieceList.ToArray();
-            BlackPieces = tempBlackPieceList.ToArray();
+            WhitePieces = new PieceList(tempWhitePieceList.ToArray());
+            BlackPieces = new PieceList(tempBlackPieceList.ToArray());
             PreviousMove = lastMove;
             CanARankRookCastle = canARankRookCastle;
             CanHRankRookCastle = canHRankRookCastle;
             IsWhite = isWhite;
         }
 
-        public GameState(Piece[] whitePieces, Piece[] blackPieces, Move previousMove, bool canARankRookCastle,
+        public GameState(Board board, PieceList whitePieces, PieceList blackPieces, Move previousMove, bool canARankRookCastle,
             bool canHRankRookCastle)
         {
-            var pieces = new List<Piece>(whitePieces.Length + blackPieces.Length);
-            pieces.AddRange(whitePieces);
-            pieces.AddRange(blackPieces);
-
-            State = new Board(pieces); //TODO implement fast board constructor/factory not using lists
+            State = board;
             WhitePieces = whitePieces;
             BlackPieces = blackPieces;
             PreviousMove = previousMove;
@@ -92,8 +92,8 @@ namespace ChessAI.DataClasses
         }
 
         public readonly Board State;
-        public readonly Piece[] WhitePieces;
-        public readonly Piece[] BlackPieces;
+        public readonly PieceList WhitePieces;
+        public readonly PieceList BlackPieces;
         public readonly Move PreviousMove;
         public readonly bool CanARankRookCastle;
         public readonly bool CanHRankRookCastle;
@@ -132,64 +132,42 @@ namespace ChessAI.DataClasses
                 }
             }
 
-            Piece[] whitePieces;
-            Piece[] blackPieces;
+            PieceList whitePieces = WhitePieces;
+            PieceList blackPieces = BlackPieces;
             
             if (move.TargetPiece != Empty)
             {
                 if (move.TargetPiece.IsWhite)
                 {
-                    whitePieces = new Piece[WhitePieces.Length - 1];
-
-                    blackPieces = new Piece[BlackPieces.Length];
-                    BlackPieces.CopyTo(blackPieces, 0);
-                    
-                    int oldI = 0;
-                    for (int newI = 0; newI < whitePieces.Length; newI++)
-                    {
-                        if (WhitePieces[oldI] == move.TargetPiece) oldI++;
-
-                        whitePieces[newI] = WhitePieces[oldI];
-                        oldI++;
-                    }
+                    whitePieces = WhitePieces.Minus(move.TargetPiece);
                 }
                 else
                 {
-                    blackPieces = new Piece[BlackPieces.Length - 1];
-                    
-                    whitePieces = new Piece[WhitePieces.Length];
-                    WhitePieces.CopyTo(whitePieces, 0);
-                    
-                    int oldI = 0;
-                    for (int newI = 0; newI < blackPieces.Length; newI++)
-                    {//TODO invert to make sure that index cannot be out of bounds
-                        if (BlackPieces[oldI] == move.TargetPiece) oldI++;
-
-                        blackPieces[newI] = BlackPieces[oldI];
-                        oldI++;
-                    }
+                    blackPieces = BlackPieces.Minus(move.TargetPiece);
                 }
             }
-            else
-            {
-                whitePieces = new Piece[WhitePieces.Length];
-                blackPieces = new Piece[BlackPieces.Length];
-                WhitePieces.CopyTo(whitePieces, 0);
-                BlackPieces.CopyTo(blackPieces, 0);
-            }
+            
 
             var moveList = move.MovePiece.IsWhite ? whitePieces : blackPieces;
-            
-            
-            for (int i = 0; i < moveList.Length; i++)
+
+
+            var modifiedMovePiece = new Piece(move.MovePiece.Content, move.EndPos);
+            for (byte i = 0; i < moveList.Length; i++)
             {
                 if (moveList[i].Position == move.StartPos)
                 {
-                    moveList[i] = new Piece(move.MovePiece.Content, move.EndPos);
+                    moveList.Edit(i, modifiedMovePiece);
                 }
             }
+
+            var fields = new Piece[State.Fields.Length];
+            State.Fields.CopyTo(fields);
+            fields[move.StartPos] = new Piece(Empty, move.StartPos);
+            fields[move.EndPos] = modifiedMovePiece;
+
+            var newBoard = new Board(fields);
             
-            var newState = new GameState(whitePieces, blackPieces, move, canARankRookCastle, canHRankRookCastle);
+            var newState = new GameState(newBoard, whitePieces, blackPieces, move, canARankRookCastle, canHRankRookCastle);
             return newState;
         }
     }

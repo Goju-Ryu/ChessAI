@@ -13,12 +13,13 @@ namespace ChessAI.MoveSelection.MoveGeneration
             List<Move> moves = new List<Move>();
 
 
-            Piece[] pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
+            PieceList pieces = calculateForWhite ? state.WhitePieces : state.BlackPieces;  
             //Piece[] pieces = state.State.Fields.ToArray();
 
-            foreach (Piece piece in pieces)
+            for (var index = 0; index < pieces.Length; index++)
             {
-                moves.AddRange(CalcMovesForPiece(state,piece));
+                Piece piece = pieces[index];
+                moves.AddRange(CalcMovesForPiece(state, piece));
             }
 
             return moves;

@@ -83,13 +83,13 @@ namespace ChessAI
         private static (bool, Result?, string) IsGameOver(GameState state)
         {
             //TODO provide smarter implementation
-            var blackHasKing = state.BlackPieces.Contains(new Piece(Piece.Black | Piece.King));
+            var blackHasKing = state.BlackPieces.Pieces.Contains(new Piece(Piece.Black | Piece.King));
             if (!blackHasKing)
             {
                 return (true, Result.WhiteWin, "Black lost its king");
             }
             
-            var whiteHasKing = state.WhitePieces.Contains(new Piece(Piece.White | Piece.King));
+            var whiteHasKing = state.WhitePieces.Pieces.Contains(new Piece(Piece.White | Piece.King));
             if (!whiteHasKing)
             {
                 return (true, Result.BlackWin, "White lost its king");

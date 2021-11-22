@@ -18,12 +18,12 @@ namespace ChessAI.MoveSelection.StateAnalysis
             var whiteScore = 0;
             var blackScore = 0;
 
-            foreach (var piece in state.WhitePieces)
+            foreach (var piece in state.WhitePieces.Pieces)
             {
                 whiteScore += PieceValue(piece) + PiecePositionPoints(piece);
             }
 
-            foreach (var piece in state.BlackPieces)
+            foreach (var piece in state.BlackPieces.Pieces)
             {
                 blackScore += PieceValue(piece) + PiecePositionPoints(piece);
             }
