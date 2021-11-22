@@ -61,13 +61,11 @@ namespace ChessAI.DataClasses
 
             move = MoveType switch
             {
-                Ordinary => "",
-                EnPeasant => "",
-                Castling => "",
                 PromotionQueen => "q",
                 PromotionRook => "r",
                 PromotionBishop => "b",
-                PromotionKnight => "k"
+                PromotionKnight => "k",
+                _ => ""
             };
             
             return move;
@@ -171,7 +169,7 @@ namespace ChessAI.DataClasses
             //TODO implement more exhaustive analysis of moveString
 
             var startPos = Board.StringToIndex(moveString.Substring(0, 2));
-            var endPos = Board.StringToIndex(moveString.Substring(2, 2)); //TODO this returns wrong index
+            var endPos = Board.StringToIndex(moveString.Substring(2, 2));
 
             return CreateSimpleMove(startPos, endPos, state);
         }

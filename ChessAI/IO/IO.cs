@@ -14,7 +14,7 @@ namespace ChessAI.IO
         /// <returns></returns>
         public (Command, string[]) ReadCommand()
         {
-            var command = System.Console.ReadLine();
+            var command = Console.In.ReadLine();
 
             return command switch
             {
