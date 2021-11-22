@@ -32,6 +32,14 @@ namespace UnitTests.DataClasses
         [Test]
         public void IndexToStringTest()
         {
+
+            //test
+            string test01 = Board.IndexToString(0x00);
+            Assert.AreEqual("A1", test01);
+
+            test01 = Board.IndexToString(0x77);
+            Assert.AreEqual("H8", test01);
+
             byte[][] ranks = {
                 new byte[]{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
                 new byte[]{ 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 },
