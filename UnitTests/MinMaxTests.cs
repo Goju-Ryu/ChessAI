@@ -10,8 +10,10 @@ using NUnit.Framework;
 
 namespace UnitTests
 {
+
     public class MinMaxTests
     {
+       
         [Test]
         public void BestMoveTest()
         {

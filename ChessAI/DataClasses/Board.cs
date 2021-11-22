@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using static ChessAI.DataClasses.Piece;
 
@@ -11,14 +12,16 @@ namespace ChessAI.DataClasses
         private const byte Width = 0x10;
         private const byte Height = 0x8;
 
-        private static readonly sbyte[] Directions =
+        private static readonly  ImmutableDictionary<Direction, sbyte> Directions =  new Dictionary<Direction, sbyte>()
         {
-            +0x10, // 1 up
-            -0x10, // 1 down
-            +0x01, // 1 right
-            -0x01, // 1 left
-        };
+            { Direction.Up, +0x10 }, // 1 up
+            { Direction.Down, -0x10 }, // 1 down
+            { Direction.Right, +0x01 }, // 1 right
+            { Direction.Left, -0x01 }, // 1 left
+        }.ToImmutableDictionary();
 
+        public static sbyte WhiteDirection(Direction direction) => Directions[direction];
+        public static sbyte BlackDirection(Direction direction) => (sbyte) -Directions[direction];
         public static readonly ImmutableDictionary<byte, byte[]> StartPositions = new Dictionary<byte, byte[]>()
         {
             { White | Pawn, new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 } },
@@ -35,9 +38,6 @@ namespace ChessAI.DataClasses
             { Black | Queen, new byte[] { 0x74 } },
             { Black | King, new byte[] { 0x73 } }
         }.ToImmutableDictionary();
-
-        public static sbyte WhiteDirection(Direction direction) => Directions[(byte)direction];
-        public static sbyte BlackDirection(Direction direction) => (sbyte)-(Directions[(byte)direction]);
 
         private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
 
@@ -83,9 +83,14 @@ namespace ChessAI.DataClasses
 
         public ReadOnlySpan<Piece> Fields => _fields.AsSpan();
 
+        public bool IsFieldOwnedByWhite(byte position)
+        {
+            return Fields[position].IsWhite;
+        }
+
         public bool IsFieldOccupied(byte position)
         {
-            return Fields[position] == Piece.Empty;
+            return Fields[position].PieceType != Piece.Empty;
         }
 
         public static bool IsIndexValid(byte index)

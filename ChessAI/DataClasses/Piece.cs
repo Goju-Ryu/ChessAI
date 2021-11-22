@@ -14,51 +14,60 @@ namespace ChessAI.DataClasses
         ///
         /// below is a description of the layout of _piece starting from the most significant bit
         /// towards the least significant on
-        ///
+        /// 
+        ///<code>
         ///     unused:         2 bits
         ///     challenges:     1 bit
         ///     is challenged:  1 bit
         ///     is white:       1 bit
         ///     Piece type:     3 bits
-        ///
+        ///</code>
         /// </summary>
         private readonly byte _piece;
 
+        /// <summary>
+        /// <inheritdoc cref="_piece"/>
+        /// </summary>
         public byte Content => _piece;
+
         public byte PieceFlags => (byte)(_piece & 0b1111_1000);
         public byte PieceType => (byte)(_piece & PieceMask);
         public byte ColorAndType => (byte)(_piece & 0x0f);
         public bool IsWhite => (PieceFlags & White) == White;
-       
+
+        
+
         /// <summary>
         /// The position of the piece as an index on an 0x88 board.
         /// If a position doesn't make sense or is unknown for this piece an invalid index is set instead.
         /// </summary>
         public byte Position { get; }
+        public bool hasMoved => (_piece & beenMovedFlag) != 0;
 
-        public Piece(byte flags)
-        {
-            _piece = flags;
-            Position = 0xAA; // Outside valid indexes as the piece has been given no 
-        }
-        
-        public Piece(int flags)
-        {
-            _piece = (byte)flags;
-            Position = 0xAA; // Outside valid indexes as the piece has been given no 
-        }
-        
+        /// <summary>
+        /// Base constructor with all arguments given and as the correct type
+        /// </summary>
+        /// <param name="flags">
+        /// piece type and color at minimum but may also contain other flags as described by <see cref="Content"/>.
+        /// </param>
+        /// <param name="position">An index describing the position on the board</param>
         public Piece(byte flags, byte position)
         {
             _piece = flags;
             Position = position;
         }
 
-        public Piece(int flags, byte position)
-        {
-            Position = position;
-            _piece = (byte)flags;
-        }
+        public Piece(byte flags) : this(flags, 0xAA){}
+
+        public Piece(int flags) : this((byte)flags, 0xAA){}
+
+        public Piece(int flags, byte position) : this((byte)flags, position){}
+
+        public Piece(byte flags, int position) : this(flags, (byte)position){}
+
+        public Piece(int flags, int position) : this((byte)flags, (byte)position){}
+
+
         //######################################//
         // Constants for easy use of this type  //
         //######################################//
@@ -67,17 +76,21 @@ namespace ChessAI.DataClasses
         public const byte PieceMask = 0b0111;
 
         // Piece definitions
-        public const byte Pawn = 0b0001;
-        public const byte Rook = 0b0010;
+        public const byte Pawn   = 0b0001;
+        public const byte Rook   = 0b0010;
         public const byte Knight = 0b0011;
         public const byte Bishop = 0b0100;
-        public const byte Queen = 0b0101;
-        public const byte King = 0b0110;
+        public const byte Queen  = 0b0101;
+        public const byte King   = 0b0110;
+
+        public const byte NumOfTypes = 6;
 
         // Flags
         public const byte White = 0b1000;
         public const byte Black = 0;
 
+        // movedFlad
+        public const byte beenMovedFlag = 0b0100_0000;
 
         public override string ToString()
         {
@@ -98,8 +111,6 @@ namespace ChessAI.DataClasses
                     _ => "Invalid"
                 }
             );
-
-            //Insert appends for other flags here as they are decided on
 
             return builder.ToString();
         }
