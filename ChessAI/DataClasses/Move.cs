@@ -151,7 +151,7 @@ namespace ChessAI.DataClasses
             //TODO implement more exhaustive analysis of moveString
 
             var startPos = Board.StringToIndex(moveString.Substring(0, 2));
-            var endPos = Board.StringToIndex(moveString.Substring(2, 2));
+            var endPos = Board.StringToIndex(moveString.Substring(2, 2)); //TODO this returns wrong index
 
             return CreateSimpleMove(startPos, endPos, state);
         }

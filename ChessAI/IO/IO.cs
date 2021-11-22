@@ -30,7 +30,7 @@ namespace ChessAI.IO
         /// <param name="move">The move this engine has chosen</param>
         public void SendMove(Move move)
         {
-            var moveString = "move" + Board.IndexToString(move.StartPos) + Board.IndexToString(move.EndPos);
+            var moveString = "move " + Board.IndexToString(move.StartPos) + Board.IndexToString(move.EndPos);
 
             moveString += move.MoveType switch
             {
@@ -67,7 +67,8 @@ namespace ChessAI.IO
             {
                 WhiteWin => "1-0",
                 BlackWin => "0-1",
-                Draw => "1/2-1/2"
+                Draw => "1/2-1/2",
+                _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
             };
             
             Console.Out.WriteLine(winnerString + " {" +message+ "}");

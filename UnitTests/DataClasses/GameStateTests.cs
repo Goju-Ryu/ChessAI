@@ -26,8 +26,8 @@ namespace UnitTests.DataClasses
             var boardFromPieces = new Board(pieces);
             var boardFromFields = new Board(fields);
 
-            var stateFromPieces = new GameState(boardFromPieces);
-            var stateFromFields = new GameState(boardFromFields);
+            var stateFromPieces = new GameState(boardFromPieces, false);
+            var stateFromFields = new GameState(boardFromFields, false);
             
            AssertStatesDeepEqual(stateFromFields, stateFromPieces);
            
@@ -45,7 +45,7 @@ namespace UnitTests.DataClasses
         [Test]
         public void ApplyMoveTest()
         {
-            var state0 = new GameState(new Board(new[] { _rook, _pawn, _queen }.ToList()));
+            var state0 = new GameState(new Board(new[] { _rook, _pawn, _queen }.ToList()), false);
 
             var move1 = Move.CreateSimpleMove(0x20, 0x22, state0);
             var state1 = state0.ApplyMove(move1);

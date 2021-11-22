@@ -21,7 +21,7 @@ namespace ChessAI.DataClasses
         /// This implementation is slow as it has to construct a PieceList itself.
         /// Use other constructors in time critical sections of code.
         /// </remarks>
-        public GameState(Board board, Move lastMove = new Move(), bool canARankRookCastle = true,
+        public GameState(Board board, bool isWhite, Move lastMove = new Move(), bool canARankRookCastle = true,
             bool canHRankRookCastle = true)
         {
             State = board;
@@ -84,9 +84,10 @@ namespace ChessAI.DataClasses
             CanHRankRookCastle = canHRankRookCastle;
         }
 
-        public static GameState CreateNewGameState()
+        public static GameState CreateNewGameState(bool isWhite)
         {
-            throw new NotImplementedException();
+            var board = Board.CreateNewBoard();
+            return new GameState(board, isWhite);
         }
 
         public readonly Board State;
@@ -148,6 +149,7 @@ namespace ChessAI.DataClasses
                         if (WhitePieces[oldI] == move.TargetPiece) oldI++;
 
                         whitePieces[newI] = WhitePieces[oldI];
+                        oldI++;
                     }
                 }
                 else
