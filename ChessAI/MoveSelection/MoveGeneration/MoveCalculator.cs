@@ -265,8 +265,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
             return moves ; 
         }
 
-        private partial List<Move> getSpecialMoves(GameState state, Piece piece);    
-        private static partial void init();
+        
     }
 
     public partial class MoveCalculator : IMoveCalculator
@@ -332,11 +331,13 @@ namespace ChessAI.MoveSelection.MoveGeneration
             {
                 RookPos = isPos ?  0x03 : Board.PositionConverter(0x03) ;
                 RoyalPos= isPos ?  0x02 : Board.PositionConverter(0x02) ;
-                if( !(state.State[left].hasMoved || state.State[kingPosition].hasMoved) )
-                    moves.Add( Move.CreateMoveTwoPieces(   
+                if( !(state.State[left].hasMoved || state.State[kingPosition].hasMoved) ){
+                // TODO create Move CASTLE 
+                    /*moves.Add( Move.CreateMoveTwoPieces(   
                         (byte)RookPos,(byte)RoyalPos,
                         state.State[left], state.State[kingPosition], 
-                        state ) );
+                        state ) );*/
+                }
             }
 
             // CHECKING RIGHT STATICALLY 
@@ -348,11 +349,13 @@ namespace ChessAI.MoveSelection.MoveGeneration
             {
                 RookPos = isPos ?  0x05 : Board.PositionConverter(0x05) ;
                 RoyalPos= isPos ?  0x06 : Board.PositionConverter(0x06) ;
-                if( !(state.State[right].hasMoved || state.State[0x04].hasMoved) )
-                    moves.Add( Move.CreateMoveTwoPieces(
+                if( !(state.State[right].hasMoved || state.State[0x04].hasMoved) ){
+                    // TODO create Move CASTLE 
+                    /*moves.Add( Move.CreateMoveTwoPieces(
                         (byte)RookPos,(byte)RoyalPos,
                         state.State[left], state.State[kingPosition],
-                        state ) );
+                        state ) );*/
+                        }
             }
                 
 
