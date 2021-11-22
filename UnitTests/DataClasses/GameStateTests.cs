@@ -43,6 +43,47 @@ namespace UnitTests.DataClasses
         }
 
         [Test]
+        public void CreateNewGameTest()
+        {
+            var state = GameState.CreateNewGameState(false);
+
+            for (int i = 0; i < 8; i++)
+            {
+                Assert.AreEqual(White | Pawn, state.State[0x10 + i].ColorAndType);
+                Assert.AreEqual(Black | Pawn, state.State[0x60 + i].ColorAndType);
+            }
+
+            var whitePieceOrder = new[]
+            {
+                new Piece(White | Rook, 0x00),
+                new Piece(White | Knight, 0x01),
+                new Piece(White | Bishop, 0x02),
+                new Piece(White | Queen, 0x03),
+                new Piece(White | King, 0x04),
+                new Piece(White | Bishop, 0x05),
+                new Piece(White | Knight, 0x06),
+                new Piece(White | Rook, 0x07),
+            };
+            var blackPieceOrder = new[]
+            {
+                new Piece(Black | Rook, 0x70),
+                new Piece(Black | Knight, 0x71),
+                new Piece(Black | Bishop, 0x72),
+                new Piece(Black | King, 0x73),
+                new Piece(Black | Queen, 0x74),
+                new Piece(Black | Bishop, 0x75),
+                new Piece(Black | Knight, 0x76),
+                new Piece(Black | Rook, 0x77),
+            };
+            
+            for (int i = 0; i < 8; i++)
+            {
+                Assert.AreEqual(whitePieceOrder[i].ColorAndType, state.State[0x00 + i].ColorAndType);
+                Assert.AreEqual(blackPieceOrder[i].ColorAndType, state.State[0x70 + i].ColorAndType);
+            }
+        }
+
+        [Test]
         public void ApplyMoveTest()
         {
             var state0 = new GameState(new Board(new[] { _rook, _pawn, _queen }.ToList()), false);

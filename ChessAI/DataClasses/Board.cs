@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
@@ -12,7 +10,7 @@ namespace ChessAI.DataClasses
         private const byte Width = 0x10;
         private const byte Height = 0x8;
 
-        private static readonly  ImmutableDictionary<Direction, sbyte> Directions =  new Dictionary<Direction, sbyte>()
+        private static readonly ImmutableDictionary<Direction, sbyte> Directions = new Dictionary<Direction, sbyte>()
         {
             { Direction.Up, +0x10 }, // 1 up
             { Direction.Down, -0x10 }, // 1 down
@@ -21,7 +19,8 @@ namespace ChessAI.DataClasses
         }.ToImmutableDictionary();
 
         public static sbyte WhiteDirection(Direction direction) => Directions[direction];
-        public static sbyte BlackDirection(Direction direction) => (sbyte) -Directions[direction];
+        public static sbyte BlackDirection(Direction direction) => (sbyte)-Directions[direction];
+
         public static readonly ImmutableDictionary<byte, byte[]> StartPositions = new Dictionary<byte, byte[]>()
         {
             { White | Pawn, new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 } },
@@ -105,14 +104,14 @@ namespace ChessAI.DataClasses
 
             return (index & 0x0F) switch
             {
-                0x00 => "A" + ((index & 0xF0) / 0x10),
-                0x01 => "B" + ((index & 0xF0) / 0x10),
-                0x02 => "C" + ((index & 0xF0) / 0x10),
-                0x03 => "D" + ((index & 0xF0) / 0x10),
-                0x04 => "E" + ((index & 0xF0) / 0x10),
-                0x05 => "F" + ((index & 0xF0) / 0x10),
-                0x06 => "G" + ((index & 0xF0) / 0x10),
-                0x07 => "H" + ((index & 0xF0) / 0x10),
+                0x00 => "A" + ((index & 0xF0) + 1),
+                0x01 => "B" + ((index & 0xF0) + 1),
+                0x02 => "C" + ((index & 0xF0) + 1),
+                0x03 => "D" + ((index & 0xF0) + 1),
+                0x04 => "E" + ((index & 0xF0) + 1),
+                0x05 => "F" + ((index & 0xF0) + 1),
+                0x06 => "G" + ((index & 0xF0) + 1),
+                0x07 => "H" + ((index & 0xF0) + 1),
                 _ => throw new ArgumentException("Argument must be a valid index")
             };
         }
@@ -147,82 +146,68 @@ namespace ChessAI.DataClasses
             var fields = new Piece[Width * Height];
             fields.Initialize();
 
-            var rowIndexes = new[] { 0x00, 0x10, 0x60, 0x70 };
-            var rowPieces = new[]
+            var pieces = new[]
             {
-                new[]
-                {
-                    new Piece(White | Rook, 0x00),
-                    new Piece(White | Knight, 0x01),
-                    new Piece(White | Bishop, 0x02),
-                    new Piece(White | Queen, 0x03),
-                    new Piece(White | King, 0x04),
-                    new Piece(White | Bishop, 0x05),
-                    new Piece(White | Knight, 0x06),
-                    new Piece(White | Rook, 0x07),
-                },
-
-                new[]
-                {
-                    new Piece(White | Pawn, 0x10),
-                    new Piece(White | Pawn, 0x11),
-                    new Piece(White | Pawn, 0x12),
-                    new Piece(White | Pawn, 0x13),
-                    new Piece(White | Pawn, 0x14),
-                    new Piece(White | Pawn, 0x15),
-                    new Piece(White | Pawn, 0x16),
-                    new Piece(White | Pawn, 0x17)
-                },
-
-                new[]
-                {
-                    new Piece(Black | Rook, 0x70),
-                    new Piece(Black | Knight, 0x71),
-                    new Piece(Black | Bishop, 0x72),
-                    new Piece(Black | King, 0x73),
-                    new Piece(Black | Queen, 0x74),
-                    new Piece(Black | Bishop, 0x75),
-                    new Piece(Black | Knight, 0x76),
-                    new Piece(Black | Rook, 0x77),
-                },
-
-                new[]
-                {
-                    new Piece(Black | Pawn, 0x60),
-                    new Piece(Black | Pawn, 0x61),
-                    new Piece(Black | Pawn, 0x62),
-                    new Piece(Black | Pawn, 0x63),
-                    new Piece(Black | Pawn, 0x64),
-                    new Piece(Black | Pawn, 0x65),
-                    new Piece(Black | Pawn, 0x66),
-                    new Piece(Black | Pawn, 0x67)
-                }
+                //White officers
+                new Piece(White | Rook, 0x00),
+                new Piece(White | Knight, 0x01),
+                new Piece(White | Bishop, 0x02),
+                new Piece(White | Queen, 0x03),
+                new Piece(White | King, 0x04),
+                new Piece(White | Bishop, 0x05),
+                new Piece(White | Knight, 0x06),
+                new Piece(White | Rook, 0x07),
+                //White pawns
+                new Piece(White | Pawn, 0x10),
+                new Piece(White | Pawn, 0x11),
+                new Piece(White | Pawn, 0x12),
+                new Piece(White | Pawn, 0x13),
+                new Piece(White | Pawn, 0x14),
+                new Piece(White | Pawn, 0x15),
+                new Piece(White | Pawn, 0x16),
+                new Piece(White | Pawn, 0x17),
+                //Black pawns
+                new Piece(Black | Pawn, 0x60),
+                new Piece(Black | Pawn, 0x61),
+                new Piece(Black | Pawn, 0x62),
+                new Piece(Black | Pawn, 0x63),
+                new Piece(Black | Pawn, 0x64),
+                new Piece(Black | Pawn, 0x65),
+                new Piece(Black | Pawn, 0x66),
+                new Piece(Black | Pawn, 0x67),
+                //Black officers
+                new Piece(Black | Rook, 0x70),
+                new Piece(Black | Knight, 0x71),
+                new Piece(Black | Bishop, 0x72),
+                new Piece(Black | King, 0x73),
+                new Piece(Black | Queen, 0x74),
+                new Piece(Black | Bishop, 0x75),
+                new Piece(Black | Knight, 0x76),
+                new Piece(Black | Rook, 0x77),
             };
 
 
-            for (int row = 0; row < 4; row++)
+            foreach (var piece in pieces)
             {
-                for (int column = 0; column < 8; column++)
-                {
-                    var index = rowIndexes[row] + column;
-                    fields[index] = rowPieces[row][column];
-                }
+                fields[piece.Position] = piece;
             }
 
             return new Board(fields);
         }
-    
+
         // ########################################### //
         //           FOR CALCULATION OF MOVES          //
         // ########################################### //
-    
-        public static byte PositionConverter(byte pos){
+
+        public static byte PositionConverter(byte pos)
+        {
             int xPos = 0x80 - pos - 0x09;
-            return (byte) xPos;
+            return (byte)xPos;
         }
 
         // TODO DOUBLE CHECK THIS IS CORRECT 
-        public static bool isDIrectionPositive(Piece piece){
+        public static bool isDIrectionPositive(Piece piece)
+        {
             return piece.IsWhite;
         }
 

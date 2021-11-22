@@ -64,9 +64,10 @@ namespace ChessAI.DataClasses
             State = new Board(tempBoardFields.ToArray());
             WhitePieces = tempWhitePieceList.ToArray();
             BlackPieces = tempBlackPieceList.ToArray();
-            PreviousMove = new Move();
-            CanARankRookCastle = true;
-            CanHRankRookCastle = true;
+            PreviousMove = lastMove;
+            CanARankRookCastle = canARankRookCastle;
+            CanHRankRookCastle = canHRankRookCastle;
+            IsWhite = isWhite;
         }
 
         public GameState(Piece[] whitePieces, Piece[] blackPieces, Move previousMove, bool canARankRookCastle,
