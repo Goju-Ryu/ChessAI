@@ -11,41 +11,42 @@ namespace ChessAI
     public class GameController
     {
         private MoveSelector _moveSelector;
-        private GameState _state;
         private TimeSpan _moveGenTimeOut;
         private IO.IO _io;
         private bool _isGameOver;
+        private bool _isPlayingWhite;
 
-        public GameController(bool isPlayerWhite, TimeSpan moveGenTimeOut)
+        public GameController(bool isPlayingWhite, TimeSpan moveGenTimeOut)
         {
             IMoveCalculator moveCalculator = new MoveCalculator();
             IMoveAnalyser moveAnalyser = new MoveAnalyserDummy();
             IStateAnalyser stateAnalyser = new StateAnalyserSimple();
-            _moveSelector = new MoveSelector(isPlayerWhite, stateAnalyser, moveAnalyser, moveCalculator);
-
-            _state = GameState.CreateNewGameState(isPlayerWhite);
+            _moveSelector = new MoveSelector(isPlayingWhite, stateAnalyser, moveAnalyser, moveCalculator);
 
             _moveGenTimeOut = moveGenTimeOut;
             _io = new IO.IO();
             _isGameOver = false;
+            _isPlayingWhite = isPlayingWhite;
         }
 
 
         public void GameLoop()
         {
+            GameState state = GameState.CreateNewGameState(_isPlayingWhite);
+            
             while (!_isGameOver)
             {
                 var (command, commandText) = _io.ReadCommand();
                 switch (command)
                 {
                     case Command.Move:
-                        PerformMoveActions(commandText[0]);
+                        PerformMoveActions(commandText[0], state);
                         break;
                     case Command.Quit:
                         Environment.Exit(0);
                         break;
                     case Command.NewGame:
-                        _state = GameState.CreateNewGameState(isWhite: false);
+                        state = GameState.CreateNewGameState(isWhite: false);
                         _isGameOver = false;
                         break;
                     case Command.Unknown:
@@ -58,23 +59,23 @@ namespace ChessAI
             }
         }
 
-        private void PerformMoveActions(string moveString)
+        private void PerformMoveActions(string moveString, GameState state)
         {
-            var enemyMove = Move.Parse(moveString, _state); // TODO get move input
+            var enemyMove = Move.Parse(moveString, state); // TODO get move input
 
-            _state = _state.ApplyMove(enemyMove);
+            state = state.ApplyMove(enemyMove);
 
-            var (isGameOver, result, message) = IsGameOver(_state);
+            var (isGameOver, result, message) = IsGameOver(state);
             if (isGameOver)
             {
                 _isGameOver = true;
                 _io.SendGameResult(result.Value, message);
             }
 
-            var bestMove = _moveSelector.BestMoveIterative(_state, _moveGenTimeOut);
+            var bestMove = _moveSelector.BestMoveIterative(state, _moveGenTimeOut);
             
             _io.SendMove(bestMove);
-            _state = _state.ApplyMove(bestMove);
+            state = state.ApplyMove(bestMove);
 
             
         }

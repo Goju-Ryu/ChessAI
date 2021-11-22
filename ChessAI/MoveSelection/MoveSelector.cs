@@ -15,7 +15,7 @@ namespace ChessAI.MoveSelection
     {
         private readonly bool _isWhite;
         private Move[] _tempBestMoves;
-        
+
         private readonly IStateAnalyser _stateAnalyser;
         private readonly IMoveAnalyser _moveAnalyser;
         private readonly IMoveCalculator _moveCalculator;
@@ -77,15 +77,20 @@ namespace ChessAI.MoveSelection
          */
         public Move BestMoveIterative(GameState state, TimeSpan timeLimit, int maxDepth = int.MaxValue)
         {
-            var task = Task.Run(() =>
-            {
-                for (int depth = 1; depth <= maxDepth; depth++)
-                {
-                    BestMove(state, depth);
-                }
-            });
+            var now = DateTime.Now;
+            var maxTime = now.Add(timeLimit);
+            var previousRunTime = TimeSpan.Zero;
 
-            task.Wait(timeLimit);
+            for (int depth = 1; depth <= maxDepth; depth++)
+            {
+                if (maxTime.Subtract(DateTime.Now) < previousRunTime)
+                {
+                    return BestMoves[0];
+                }
+
+                BestMove(state, depth);
+            }
+
 
             return BestMoves[0];
         }

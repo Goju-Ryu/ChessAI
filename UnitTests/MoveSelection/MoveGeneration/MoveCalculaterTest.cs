@@ -228,42 +228,44 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         public void PawnMoves_01 (){
 
             List<Piece> pieces = new List<Piece>();
-            Board board;
-            GameState state;
-            MoveCalculator MC;
-            List<Move> moves ;
-
-            void test(byte color , int exspected, byte Row , bool isWhite){
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x00 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x01 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x02 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x03 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x04 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x05 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x06 ) );
-                pieces.Add ( new Piece( Piece.Pawn ^ color, Row + 0x07 ) );
-                
-                board = TestBuilder.GenerateBoard(pieces);
-                state = new GameState(board, false);
-
-                MC = new MoveCalculator();
-                moves = MC.CalculatePossibleMoves(state, isWhite);
-
-                Console.WriteLine(board);
-                Assert.AreEqual(exspected,moves.Count);
-            }
+            
 
             Console.WriteLine("TEST 1");
-            test(Piece.White, 16, 0x10, true);
+            test(pieces, Piece.White, 16, 0x10, true);
             Console.WriteLine("TEST 2");
-            test(Piece.Black, 8 , 0x10, false);
+            test(pieces, Piece.Black, 8 , 0x10, false);
 
             pieces.Clear();
 
             Console.WriteLine("TEST 3");
-            test(Piece.Black, 16, 0x60, false);
+            test(pieces, Piece.Black, 16, 0x60, false);
             Console.WriteLine("TEST 4");
-            test(Piece.White, 8 , 0x60, true);
+            test(pieces, Piece.White, 8 , 0x60, true);
+        }
+        
+        private void test(List<Piece> pieces, byte color , int expected, byte row , bool isWhite){
+            Board board;
+            GameState state;
+            MoveCalculator MC;
+            List<Move> moves ;
+            
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x00 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x01 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x02 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x03 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x04 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x05 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x06 ) );
+            pieces.Add ( new Piece( Piece.Pawn ^ color, row + 0x07 ) );
+                
+            board = TestBuilder.GenerateBoard(pieces);
+            state = new GameState(board, false);
+
+            MC = new MoveCalculator();
+            moves = MC.CalculatePossibleMoves(state, isWhite);
+
+            Console.WriteLine(board);
+            Assert.AreEqual(expected,moves.Count);
         }
 
         [Test]

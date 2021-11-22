@@ -11,7 +11,7 @@ namespace ChessAI.DataClasses
      * A struct that keeps track of all relevant information about a game
      * </summary>
      */
-    public readonly struct GameState
+    public readonly ref struct GameState
     {
         /// <summary>
         /// An easy to use constructor taking only a board.
@@ -162,10 +162,11 @@ namespace ChessAI.DataClasses
                     
                     int oldI = 0;
                     for (int newI = 0; newI < blackPieces.Length; newI++)
-                    {
+                    {//TODO invert to make sure that index cannot be out of bounds
                         if (BlackPieces[oldI] == move.TargetPiece) oldI++;
 
                         blackPieces[newI] = BlackPieces[oldI];
+                        oldI++;
                     }
                 }
             }
@@ -182,7 +183,7 @@ namespace ChessAI.DataClasses
             
             for (int i = 0; i < moveList.Length; i++)
             {
-                if (moveList[i] == move.MovePiece)
+                if (moveList[i].Position == move.StartPos)
                 {
                     moveList[i] = new Piece(move.MovePiece.Content, move.EndPos);
                 }

@@ -239,7 +239,9 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 piece.Position + posDelta[2]
             };   
             
-            void validatePosition(byte pos , Piece piece, Board board){
+            void ValidatePosition(byte pos , Piece piece, GameState state)
+            {
+                var board = state.State;
                 // diagonal Move
                 if(  Math.Abs ( pos - piece.Position ) % 0x10 == 0 ){
                     // STRAIGHT LINE 
@@ -259,7 +261,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     break;
                 }
 
-                validatePosition( (byte) moveArr[i],   piece,  state.State );
+                ValidatePosition( (byte) moveArr[i],   piece,  state);
             }
 
             return moves ; 

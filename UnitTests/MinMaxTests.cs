@@ -65,7 +65,7 @@ namespace UnitTests
                         return -1;
                     }
 
-                    return (MoveAnalysis(state, s) - MoveAnalysis(state, s1)) % 1;
+                    return 0; //(MoveAnalysis(state, s) - MoveAnalysis(state, s1)) % 1;
                 }
             );
         }
