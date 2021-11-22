@@ -52,13 +52,15 @@ namespace UnitTests.DataClasses
             };
             string[] files = { "A", "B", "C", "D", "E", "F", "G", "H" };
             
+            Console.WriteLine("########################");
             for (int i = 0; i < ranks.Length; i++)
             {
                 for (int j = 0; j < files.Length; j++)
                 {
                     var expectedString = files[j] + (i + 1);
-                    var indexString = Board.IndexToString(ranks[i][j]);
-                     Assert.AreEqual(expectedString, indexString);
+                    var indexString = Board.IndexToString(ranks[j][i]);
+                    
+                    Assert.AreEqual(expectedString, indexString);
                 }
                
             }

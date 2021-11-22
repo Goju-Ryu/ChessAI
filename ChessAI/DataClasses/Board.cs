@@ -102,6 +102,30 @@ namespace ChessAI.DataClasses
         {
             if (!IsIndexValid(index)) throw new ArgumentException("Argument must be a valid index");
 
+            int COL = index / 0x10;
+            int ROW = index % 0x10;    
+
+            Console.WriteLine("---- ---   --- -");
+            if(index == 0x77){
+                Console.WriteLine("CALC = " +0x77 +"/8 = " + COL );
+                Console.WriteLine("CALC = " +0x77 +"%8 = " + ROW );
+            }
+
+            string str ="";
+            switch(COL){
+                case 0: str += "A"; break;
+                case 1: str += "B"; break;
+                case 2: str += "C"; break;
+                case 3: str += "D"; break;
+                case 4: str += "E"; break;
+                case 5: str += "F"; break;
+                case 6: str += "G"; break;
+                case 7: str += "H"; break;
+            }
+
+            str += (ROW+1) ;
+            return str;
+            /*
             return (index % 8) switch
             {
                 0x00 => "A" + ((index & 0xF0) + 1).ToString()[0],
@@ -114,6 +138,7 @@ namespace ChessAI.DataClasses
                 0x07 => "H" + ((index & 0xF0) + 1).ToString()[0],
                 _ => throw new ArgumentException("Argument must be a valid index")
             };
+            */
         }
 
         public static byte StringToIndex(string fieldName)
