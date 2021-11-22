@@ -146,17 +146,26 @@ namespace ChessAI.DataClasses
                     blackPieces = BlackPieces.Minus(move.TargetPiece);
                 }
             }
-            
-
-            var moveList = move.MovePiece.IsWhite ? whitePieces : blackPieces;
-
 
             var modifiedMovePiece = new Piece(move.MovePiece.Content, move.EndPos);
-            for (byte i = 0; i < moveList.Length; i++)
+            if (move.MovePiece.IsWhite)
             {
-                if (moveList[i].Position == move.StartPos)
+                for (byte i = 0; i < whitePieces.Length; i++)
                 {
-                    moveList.Edit(i, modifiedMovePiece);
+                    if (whitePieces[i].Position == move.StartPos)
+                    {
+                        whitePieces = whitePieces.Edit(i, modifiedMovePiece);
+                    }
+                }
+            }
+            else
+            {
+                for (byte i = 0; i < blackPieces.Length; i++)
+                {
+                    if (blackPieces[i].Position == move.StartPos)
+                    {
+                        blackPieces = blackPieces.Edit(i, modifiedMovePiece);
+                    }
                 }
             }
 
