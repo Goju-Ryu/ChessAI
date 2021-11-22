@@ -211,6 +211,41 @@ namespace ChessAI.DataClasses
 
             return new Board(fields);
         }
+    
+        // ########################################### //
+        //           FOR CALCULATION OF MOVES          //
+        // ########################################### //
+    
+        public static byte PositionConverter(byte pos){
+            int xPos = 0x80 - pos - 0x09;
+            return (byte) xPos;
+        }
+
+        // TODO DOUBLE CHECK THIS IS CORRECT 
+        public static bool isDIrectionPositive(Piece piece){
+            return piece.IsWhite;
+        }
+
+
+        public override string ToString()
+        {
+            String str = "{";
+            for (int i = 0; i < Fields.Length; i++)
+            {
+                if (i % 0x10 == 0)
+                {
+                    str += "\n";
+                }
+                else if (i % 0x08 == 0)
+                {
+                    str += "\t";
+                }
+
+                str += "\t" + Fields[i].ToString();
+            }
+
+            return str;
+        }
     }
 
     public enum Direction : byte
