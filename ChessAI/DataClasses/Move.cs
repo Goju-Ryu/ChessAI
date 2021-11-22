@@ -55,6 +55,24 @@ namespace ChessAI.DataClasses
             TargetPiece = targetPiece;
         }
 
+        public override string ToString()
+        {
+            var move = Board.IndexToString(StartPos) + Board.IndexToString(EndPos);
+
+            move = MoveType switch
+            {
+                Ordinary => "",
+                EnPeasant => "",
+                Castling => "",
+                PromotionQueen => "q",
+                PromotionRook => "r",
+                PromotionBishop => "b",
+                PromotionKnight => "k"
+            };
+            
+            return move;
+        }
+
         /// <summary>
         /// A factory method that creates a simple move where no special rules are involved.
         /// </summary>

@@ -102,25 +102,19 @@ namespace ChessAI.DataClasses
         {
             if (!IsIndexValid(index)) throw new ArgumentException("Argument must be a valid index");
 
-            int COL = index / 0x10;
-            int ROW = index % 0x10;    
-
-            Console.WriteLine("---- ---   --- -");
-            if(index == 0x77){
-                Console.WriteLine("CALC = " +0x77 +"/8 = " + COL );
-                Console.WriteLine("CALC = " +0x77 +"%8 = " + ROW );
-            }
+            int COL = index % 0x10;
+            int ROW = index / 0x10;
 
             string str ="";
             switch(COL){
-                case 0: str += "A"; break;
-                case 1: str += "B"; break;
-                case 2: str += "C"; break;
-                case 3: str += "D"; break;
-                case 4: str += "E"; break;
-                case 5: str += "F"; break;
-                case 6: str += "G"; break;
-                case 7: str += "H"; break;
+                case 0: str += "a"; break;
+                case 1: str += "b"; break;
+                case 2: str += "c"; break;
+                case 3: str += "d"; break;
+                case 4: str += "e"; break;
+                case 5: str += "f"; break;
+                case 6: str += "g"; break;
+                case 7: str += "h"; break;
             }
 
             str += (ROW+1) ;

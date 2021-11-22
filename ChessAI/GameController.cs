@@ -40,7 +40,7 @@ namespace ChessAI
                 switch (command)
                 {
                     case Command.Move:
-                        PerformMoveActions(commandText[0], state);
+                        PerformMoveActions(commandText[0], ref state);
                         break;
                     case Command.Quit:
                         Environment.Exit(0);
@@ -59,7 +59,7 @@ namespace ChessAI
             }
         }
 
-        private void PerformMoveActions(string moveString, GameState state)
+        private void PerformMoveActions(string moveString, ref GameState state)
         {
             var enemyMove = Move.Parse(moveString, state); // TODO get move input
 
@@ -77,8 +77,6 @@ namespace ChessAI
             
             _io.SendMove(bestMove);
             state = state.ApplyMove(bestMove);
-
-            
         }
 
         private static (bool, Result?, string) IsGameOver(GameState state)
