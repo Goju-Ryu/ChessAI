@@ -102,16 +102,16 @@ namespace ChessAI.DataClasses
         {
             if (!IsIndexValid(index)) throw new ArgumentException("Argument must be a valid index");
 
-            return (index & 0x0F) switch
+            return (index % 8) switch
             {
-                0x00 => "A" + ((index & 0xF0) + 1),
-                0x01 => "B" + ((index & 0xF0) + 1),
-                0x02 => "C" + ((index & 0xF0) + 1),
-                0x03 => "D" + ((index & 0xF0) + 1),
-                0x04 => "E" + ((index & 0xF0) + 1),
-                0x05 => "F" + ((index & 0xF0) + 1),
-                0x06 => "G" + ((index & 0xF0) + 1),
-                0x07 => "H" + ((index & 0xF0) + 1),
+                0x00 => "A" + ((index & 0xF0) + 1).ToString()[0],
+                0x01 => "B" + ((index & 0xF0) + 1).ToString()[0],
+                0x02 => "C" + ((index & 0xF0) + 1).ToString()[0],
+                0x03 => "D" + ((index & 0xF0) + 1).ToString()[0],
+                0x04 => "E" + ((index & 0xF0) + 1).ToString()[0],
+                0x05 => "F" + ((index & 0xF0) + 1).ToString()[0],
+                0x06 => "G" + ((index & 0xF0) + 1).ToString()[0],
+                0x07 => "H" + ((index & 0xF0) + 1).ToString()[0],
                 _ => throw new ArgumentException("Argument must be a valid index")
             };
         }

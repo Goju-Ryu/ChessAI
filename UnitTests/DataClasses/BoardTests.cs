@@ -32,12 +32,27 @@ namespace UnitTests.DataClasses
         [Test]
         public void IndexToStringTest()
         {
-            byte[] rank1 = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+            byte[][] ranks = {
+                new byte[]{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
+                new byte[]{ 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 },
+                new byte[]{ 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27 },
+                new byte[]{ 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 },
+                new byte[]{ 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47 },
+                new byte[]{ 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57 },
+                new byte[]{ 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67 },
+                new byte[]{ 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 }
+            };
             string[] files = { "A", "B", "C", "D", "E", "F", "G", "H" };
             
-            for (int i = 0; i < rank1.Length; i++)
+            for (int i = 0; i < ranks.Length; i++)
             {
-                Assert.AreEqual(files[i] + 1, Board.IndexToString(rank1[i]));
+                for (int j = 0; j < files.Length; j++)
+                {
+                    var expectedString = files[j] + (i + 1);
+                    var indexString = Board.IndexToString(ranks[i][j]);
+                     Assert.AreEqual(expectedString, indexString);
+                }
+               
             }
         }
 

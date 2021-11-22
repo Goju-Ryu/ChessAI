@@ -19,7 +19,6 @@ namespace UnitTests.DataClasses
         [Test]
         public void PieceToString()
         {
-            /*
             var black = "Black";
             var white = "White";
             var pieces = new[]
@@ -39,12 +38,6 @@ namespace UnitTests.DataClasses
                 Assert.AreEqual(white + " " + pieces[i], new Piece(White | i).ToString());
                 Assert.AreEqual(black + " " + pieces[i], new Piece(Black | i).ToString());
             }
-            */
         }
-
-
-
-
-
     }
 }
