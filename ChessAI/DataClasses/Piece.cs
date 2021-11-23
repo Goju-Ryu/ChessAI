@@ -94,7 +94,32 @@ namespace ChessAI.DataClasses
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
+            string str ="";
+            if(this.PieceType == Piece.Empty)
+                return ".";
+
+            if(this.IsWhite){
+                switch(this.PieceType){
+                    case Piece.Pawn:    str += "|p|";     break;   
+                    case Piece.Rook:    str += "|r|";     break;
+                    case Piece.Knight:  str += "|k|";     break;
+                    case Piece.Bishop:  str += "|b|";     break;
+                    case Piece.Queen:   str += "|q|";     break;
+                    case Piece.King:    str += "|K|";     break;
+                }
+            }else{
+                switch(this.PieceType){
+                    case Piece.Pawn:    str += "p";     break;   
+                    case Piece.Rook:    str += "r";     break;
+                    case Piece.Knight:  str += "k";     break;
+                    case Piece.Bishop:  str += "b";     break;
+                    case Piece.Queen:   str += "q";     break;
+                    case Piece.King:    str += "k";     break;
+                }
+            }
+            return str;
+
+            /*var builder = new StringBuilder();
 
             builder.Append((PieceFlags & White) == White ? "White" : "Black");
             builder.Append(" ");
@@ -112,7 +137,7 @@ namespace ChessAI.DataClasses
                 }
             );
 
-            return builder.ToString();
+            return builder.ToString();*/
         }
 
         public bool Equals(Piece other)

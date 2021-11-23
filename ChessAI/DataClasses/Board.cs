@@ -198,8 +198,8 @@ namespace ChessAI.DataClasses
                 new Piece(Black | Rook, 0x70),
                 new Piece(Black | Knight, 0x71),
                 new Piece(Black | Bishop, 0x72),
-                new Piece(Black | King, 0x73),
-                new Piece(Black | Queen, 0x74),
+                new Piece(Black | Queen, 0x73),
+                new Piece(Black | King, 0x74),
                 new Piece(Black | Bishop, 0x75),
                 new Piece(Black | Knight, 0x76),
                 new Piece(Black | Rook, 0x77),
@@ -233,19 +233,40 @@ namespace ChessAI.DataClasses
 
         public override string ToString()
         {
-            String str = "{";
-            for (int i = 0; i < Fields.Length; i++)
-            {
-                if (i % 0x10 == 0)
-                {
-                    str += "\n";
-                }
-                else if (i % 0x08 == 0)
-                {
+            char[] Columns  = new char[]{'A','B','C','D','E','F','G','H'};
+            char[] Rows     = new char[]{'1','2','3','4','5','6','7','8'};
+            int rowNum = 7;
+            String str = "\t";
+            //for (int i = 0; i < Fields.Length; i++)
+            /*{
+                if (i % 0x10 == 0){
+                    str += "\n" + Rows[rowNum++] + ":";}
+                else if (i % 0x08 == 0){
                     str += "\t";
                 }
-
                 str += "\t" + Fields[i].ToString();
+            }*/
+            
+            foreach(char c in Columns){
+                 str += c + "\t";
+            }
+            str +="\n\t";
+
+            foreach(char c in Columns){
+                 str += "_\t";
+            }
+            str +="\n";
+
+            int row, col;
+            for (col = 0x70; col >=0 ; col-= 0x10)
+            {
+                
+                str += Rows[rowNum--] + ":\t";
+                for (row = 0x00; row < 0x08; row+= 0x01)
+                {
+                   str += Fields[ (col + row) ].ToString() + "\t";
+                }
+                str += "\n";
             }
 
             return str;

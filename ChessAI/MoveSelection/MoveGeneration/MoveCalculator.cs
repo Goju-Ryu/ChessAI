@@ -55,7 +55,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
 
             if (piece.PieceType == Piece.Pawn)
             {
-//                Console.WriteLine("PAWN   ");
+//              Console.WriteLine("PAWN   ");
                 moves.AddRange(genPawnMoves(state, piece));
             }
 
@@ -356,6 +356,8 @@ namespace ChessAI.MoveSelection.MoveGeneration
 
             return moves;
         }
+       
+       
         /*
         GameState? PawnPromotion(GameState state, Piece piece){
 

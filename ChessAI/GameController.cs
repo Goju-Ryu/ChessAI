@@ -77,6 +77,7 @@ namespace ChessAI
             
             _io.SendMove(bestMove);
             state = state.ApplyMove(bestMove);
+            _io.PrintBoard(state);
         }
 
         private static (bool, Result?, string) IsGameOver(GameState state)

@@ -45,6 +45,12 @@ namespace ChessAI.IO
             Console.Out.Flush();
         }
         
+
+        public void PrintBoard(GameState state){
+            Console.Out.WriteLine(state.State);
+            Console.Out.Flush();
+        }
+
         /// <summary>
         /// Respond to XBoard that signifies that a command was not understood
         /// </summary>

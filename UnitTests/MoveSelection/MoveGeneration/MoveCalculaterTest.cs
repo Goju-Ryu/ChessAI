@@ -180,7 +180,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         [Test]
         public void KingMoves(){
             
-            void testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            List<Move> testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
                 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.King ^ Piece.Black  , 0x44 ) );
@@ -198,8 +198,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
                 List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
-                Console.Write(board + "\n\n\n");
-                Assert.AreEqual( exspectedNum , moves.Count );
+                return moves;
             }
 
             List<byte[]> obstructions = new List<byte[]>();
@@ -215,13 +214,20 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
             int[] exspectedMoves =      { 8 , 7 , 6 ,5 ,4 ,3, 2, 1 , 0};
             
+            List<Move> Friendly = new List<Move>();
+            List<Move> Hostile = new List<Move>();
 
             for (int i = 0; i < obstructions.Count; i++)
             {
-                testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
-                testWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
+                Friendly = testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
+                Hostile  = testWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
             }
-          
+
+            for (int i = 0; i < Friendly.Count; i++)
+            {
+                Assert.True( Friendly[i].TargetPiece.PieceType == Piece.Empty );  
+            }
+
         }
 
         [Test]
@@ -351,5 +357,74 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
             }           
         }
+    
+        [Test]
+        public void KingMoves2(){
+
+                List<Piece> pieces = new List<Piece>();
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x10 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x11 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x12 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x13 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x14 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x35 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x16 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.White  , 0x17 ) );
+
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x60 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x61 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x62 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x33 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x64 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x65 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x66 ) );
+                pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black  , 0x67 ) );
+
+                // ROOKS 
+                pieces.Add ( new Piece( Piece.Rook ^ Piece.Black  , 0x77 ) );
+                pieces.Add ( new Piece( Piece.Rook ^ Piece.Black  , 0x70 ) );
+                pieces.Add ( new Piece( Piece.Rook ^ Piece.White  , 0x00 ) );
+                pieces.Add ( new Piece( Piece.Rook ^ Piece.White  , 0x07 ) );
+
+                //KNIGHT 
+                pieces.Add ( new Piece( Piece.Knight ^ Piece.Black  , 0x71 ) );
+                pieces.Add ( new Piece( Piece.Knight ^ Piece.Black  , 0x76 ) );
+                pieces.Add ( new Piece( Piece.Knight ^ Piece.White  , 0x43 ) );
+                pieces.Add ( new Piece( Piece.Knight ^ Piece.White  , 0x06 ) );
+
+                //Bishop 
+                pieces.Add ( new Piece( Piece.Bishop ^ Piece.Black  , 0x72 ) );
+                pieces.Add ( new Piece( Piece.Bishop ^ Piece.Black  , 0x75 ) );
+                pieces.Add ( new Piece( Piece.Bishop ^ Piece.White  , 0x02 ) );
+                pieces.Add ( new Piece( Piece.Bishop ^ Piece.White  , 0x05 ) );
+
+                //KING
+                Piece SecondPiece=new Piece(Piece.King ^ Piece.Black , 0x74);
+                Piece MAINPIECE = new Piece( Piece.King ^ Piece.White  , 0x04 ) ;
+                pieces.Add(SecondPiece);
+                pieces.Add ( MAINPIECE  );
+
+                // QUEEN
+                pieces.Add ( new Piece( Piece.Queen ^ Piece.Black  , 0x73 ) );
+                pieces.Add ( new Piece( Piece.Queen ^ Piece.White  , 0x03 ) );
+
+
+                Board board = TestBuilder.GenerateBoard(pieces);
+                MoveCalculator MC = new MoveCalculator();
+                GameState state = new GameState(board, false);
+
+            Console.WriteLine(board);
+                
+                List<Move> moves = MC.CalcMovesForPiece(state, MAINPIECE);
+                Console.WriteLine(moves.Count);
+                Console.WriteLine(moves[0]);
+                    
+                moves = MC.CalcMovesForPiece(state, SecondPiece);
+                Console.WriteLine(moves.Count);
+                Console.WriteLine(moves[0]);
+
+                Assert.False(true);
+        }
+            
     }
 }
