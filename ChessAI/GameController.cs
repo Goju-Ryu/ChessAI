@@ -73,7 +73,7 @@ namespace ChessAI
             }
 
             // var bestMove = _moveSelector.BestMoveIterative(state, _moveGenTimeOut);
-            var bestMove = _moveSelector.BestMove(state, 3);
+            var bestMove = _moveSelector.BestMoveIterative(state, TimeSpan.FromSeconds(10));
             
             _io.SendMove(bestMove);
             state = state.ApplyMove(bestMove);
