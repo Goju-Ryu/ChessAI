@@ -61,7 +61,7 @@ namespace ChessAI
 
         private void PerformMoveActions(string moveString, ref GameState state)
         {
-            var enemyMove = Move.Parse(moveString, state); // TODO get move input
+            var enemyMove = Move.Parse(moveString, state, true); // TODO get move input
 
             state = state.ApplyMove(enemyMove);
 

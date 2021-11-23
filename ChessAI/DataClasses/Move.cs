@@ -164,12 +164,62 @@ namespace ChessAI.DataClasses
             return move;
         }
 
-        public static Move Parse(string moveString, GameState state)
+        public static Move Parse(string moveString, GameState state, bool isEnemyMove)
         {
             //TODO implement more exhaustive analysis of moveString
+            moveString = moveString.ToLower();
 
             var startPos = Board.StringToIndex(moveString.Substring(0, 2));
             var endPos = Board.StringToIndex(moveString.Substring(2, 2));
+            var movePiece = state.State[startPos];
+
+            if (moveString.Length > 4)
+            {
+                // Truth table:
+                //  enMove  |   isWhite |   result  |   color
+                //  1       |   1       |   0       |   black
+                //  1       |   0       |   1       |   white
+                //  0       |   1       |   1       |   white
+                //  0       |   0       |   0       |   black
+                var color = isEnemyMove ^ GameState.IsWhite ? White : Black;
+                var promotionPiece = moveString[4] switch
+                {
+                    'q' => new Piece(color | Queen, endPos),
+                    'k' => new Piece(color | Knight, endPos),
+                    'r' => new Piece(color | Rook, endPos),
+                    'b' => new Piece(color | Bishop, endPos),
+                    _ => throw new ArgumentException($"Move: ({moveString}) could not be parsed due to letter '{moveString[4]}'")
+                };
+                return CreatePawnPromotionMove(startPos, endPos, promotionPiece, state);
+            }
+
+            if (movePiece.PieceType == King)
+            {
+                if (Math.Abs(startPos - endPos) == 2)
+                {
+                    var castlePos = (byte)((startPos - endPos) > 0 ? endPos - 2 : endPos + 1); //TODO Validate that this is correct calculation
+                    return CreateCastleMove(castlePos, state);
+                }
+            }
+
+            var previousMove = state.PreviousMove;
+            if (previousMove.MovePiece.PieceType == Pawn)
+            {
+                if (((previousMove.StartPos - previousMove.EndPos) / 0x10) == 2)
+                {
+                    if (movePiece.PieceType == Pawn)
+                    {
+                        if (Math.Abs(startPos - previousMove.EndPos) == 1 )
+                        {
+                            if (Math.Abs(endPos - previousMove.EndPos) == 0x10)
+                            {
+                                //TODO validate that this is always an en peasant move and cannot be any other
+                                return CreateEnPeasantMove(startPos, previousMove.EndPos, state);
+                            }
+                        }
+                    }
+                }
+            }
 
             return CreateSimpleMove(startPos, endPos, state);
         }
