@@ -19,7 +19,7 @@ namespace ChessAI
         public GameController(bool isPlayingWhite, TimeSpan moveGenTimeOut)
         {
             IMoveCalculator moveCalculator = new MoveCalculator();
-            IMoveAnalyser moveAnalyser = new MoveAnalyserDummy();
+            IMoveAnalyser moveAnalyser = new MoveAnalyserFast();
             IStateAnalyser stateAnalyser = new StateAnalyserSimple();
             _moveSelector = new MoveSelector(isPlayingWhite, stateAnalyser, moveAnalyser, moveCalculator);
 

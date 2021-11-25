@@ -14,30 +14,6 @@ namespace ChessAI.DataClasses
         public readonly byte EndPos;
         public readonly MoveType MoveType;
 
-
-        /// <summary>
-        /// a simple constructor taking the start and end position.
-        /// </summary>
-        /// <param name="startPos">starting position</param>
-        /// <param name="endPos">destination</param>
-        /// <remarks>
-        /// This constructor has only been left here for compatibility concerns and should not be used.
-        /// When encountered it should be replaced by a factory method call.
-        /// The <see cref="CreateSimpleMove"/> Factory is the recommended alternative. It makes sure to set all the
-        /// required fields in the correct way only given start and end position and a state.
-        /// </remarks>
-        [ObsoleteAttribute("When encountered it should be replaced by a factory method call."
-                           + "The CreateSimpleMove Factory is the recommended alternative.", false)]
-        public Move(byte startPos, byte endPos)
-        {
-            StartPos = startPos;
-            EndPos = endPos;
-
-            MoveType = Ordinary;
-            MovePiece = new Piece(Empty);
-            TargetPiece = MovePiece;
-        }
-
         /// <summary>
         /// A constructor that takes all the required parameters to define a move
         /// </summary>
@@ -67,9 +43,28 @@ namespace ChessAI.DataClasses
                 PromotionKnight => "k",
                 _ => ""
             };
-            
+
             return move;
         }
+
+        private sealed class MoveEqualityComparer : IEqualityComparer<Move>
+        {
+            public bool Equals(Move x, Move y)
+            {
+                return x.MoveType == y.MoveType &&
+                       x.StartPos == y.StartPos && 
+                       x.EndPos == y.EndPos &&
+                       x.MovePiece.Equals(y.MovePiece) &&
+                       x.TargetPiece.Equals(y.TargetPiece);
+            }
+
+            public int GetHashCode(Move obj)
+            {
+                return HashCode.Combine(obj.MovePiece, obj.TargetPiece, obj.StartPos, obj.EndPos, (int)obj.MoveType);
+            }
+        }
+
+        public static IEqualityComparer<Move> MoveComparer { get; } = new MoveEqualityComparer();
 
         /// <summary>
         /// A factory method that creates a simple move where no special rules are involved.
@@ -190,7 +185,8 @@ namespace ChessAI.DataClasses
                     'k' => new Piece(color | Knight, endPos),
                     'r' => new Piece(color | Rook, endPos),
                     'b' => new Piece(color | Bishop, endPos),
-                    _ => throw new ArgumentException($"Move: ({moveString}) could not be parsed due to letter '{moveString[4]}'")
+                    _ => throw new ArgumentException(
+                        $"Move: ({moveString}) could not be parsed due to letter '{moveString[4]}'")
                 };
                 return CreatePawnPromotionMove(startPos, endPos, promotionPiece, state);
             }
@@ -199,7 +195,10 @@ namespace ChessAI.DataClasses
             {
                 if (Math.Abs(startPos - endPos) == 2)
                 {
-                    var castlePos = (byte)((startPos - endPos) > 0 ? endPos - 2 : endPos + 1); //TODO Validate that this is correct calculation
+                    var castlePos =
+                        (byte)((startPos - endPos) > 0
+                            ? endPos - 2
+                            : endPos + 1); //TODO Validate that this is correct calculation
                     return CreateCastleMove(castlePos, state);
                 }
             }
@@ -211,7 +210,7 @@ namespace ChessAI.DataClasses
                 {
                     if (movePiece.PieceType == Pawn)
                     {
-                        if (Math.Abs(startPos - previousMove.EndPos) == 1 )
+                        if (Math.Abs(startPos - previousMove.EndPos) == 1)
                         {
                             if (Math.Abs(endPos - previousMove.EndPos) == 0x10)
                             {
