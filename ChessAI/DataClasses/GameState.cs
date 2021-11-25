@@ -74,7 +74,8 @@ namespace ChessAI.DataClasses
             IsWhite = isWhite;
         }
 
-        public GameState(Board board, PieceList whitePieces, PieceList blackPieces, Move previousMove, bool canARankRookCastle,
+        public GameState(Board board, PieceList whitePieces, PieceList blackPieces, Move previousMove,
+            bool canARankRookCastle,
             bool canHRankRookCastle)
         {
             State = board;
@@ -132,51 +133,101 @@ namespace ChessAI.DataClasses
                 }
             }
 
+            // Update PieceLists
             PieceList whitePieces = WhitePieces;
             PieceList blackPieces = BlackPieces;
-            
-            if (move.TargetPiece != Empty)
-            {
-                if (move.TargetPiece.IsWhite)
-                {
-                    whitePieces = WhitePieces.Minus(move.TargetPiece);
-                }
-                else
-                {
-                    blackPieces = BlackPieces.Minus(move.TargetPiece);
-                }
-            }
-
-            var modifiedMovePiece = new Piece(move.MovePiece.Content, move.EndPos);
-            if (move.MovePiece.IsWhite)
-            {
-                for (byte i = 0; i < whitePieces.Length; i++)
-                {
-                    if (whitePieces[i].Position == move.StartPos)
-                    {
-                        whitePieces = whitePieces.Edit(i, modifiedMovePiece);
-                    }
-                }
-            }
-            else
-            {
-                for (byte i = 0; i < blackPieces.Length; i++)
-                {
-                    if (blackPieces[i].Position == move.StartPos)
-                    {
-                        blackPieces = blackPieces.Edit(i, modifiedMovePiece);
-                    }
-                }
-            }
 
             var fields = new Piece[State.Fields.Length];
             State.Fields.CopyTo(fields);
-            fields[move.StartPos] = new Piece(Empty, move.StartPos);
-            fields[move.EndPos] = modifiedMovePiece;
+
+            switch (move.MoveType)
+            {
+                case MoveType.Ordinary:
+                case MoveType.EnPeasant:
+                    if (move.TargetPiece != Empty)
+                    {
+                        if (move.TargetPiece.IsWhite)
+                        {
+                            whitePieces = WhitePieces.Minus(move.TargetPiece);
+                        }
+                        else
+                        {
+                            blackPieces = BlackPieces.Minus(move.TargetPiece);
+                        }
+                    }
+
+                    var modifiedMovePiece = new Piece(move.MovePiece.Content, move.EndPos);
+                    if (move.MovePiece.IsWhite)
+                    {
+                        for (byte i = 0; i < whitePieces.Length; i++)
+                        {
+                            if (whitePieces[i].Position == move.StartPos)
+                            {
+                                whitePieces = whitePieces.Edit(i, modifiedMovePiece);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (byte i = 0; i < blackPieces.Length; i++)
+                        {
+                            if (blackPieces[i].Position == move.StartPos)
+                            {
+                                blackPieces = blackPieces.Edit(i, modifiedMovePiece);
+                            }
+                        }
+                    }
+
+                    fields[move.StartPos] = new Piece(Empty, move.StartPos);
+                    fields[move.EndPos] = modifiedMovePiece;
+                    if (move.EndPos != move.TargetPiece.Position)
+                    {
+                        fields[move.TargetPiece.Position] = new Piece(Empty, move.TargetPiece.Position);
+                    }
+
+                    break;
+
+                case MoveType.Castling:
+                    var rookStartPos = move.StartPos - move.EndPos < 0 ? move.EndPos + 1 : move.EndPos - 2;
+                    var rookEndPos = move.StartPos - move.EndPos > 0 ? move.EndPos + 1 : move.EndPos - 2;
+                    var modifiedKing = new Piece(move.MovePiece.Content, move.EndPos);
+                    var modifiedRook = new Piece(State[move.EndPos].Content, rookEndPos);
+
+                    if (move.MovePiece.IsWhite)
+                    {
+                        for (byte i = 0; i < whitePieces.Length; i++)
+                        {
+                            if (whitePieces[i].Position == move.StartPos)
+                            {
+                                whitePieces = whitePieces.Edit(i, modifiedKing);
+                                whitePieces = whitePieces.Edit(i, modifiedRook);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (byte i = 0; i < blackPieces.Length; i++)
+                        {
+                            if (blackPieces[i].Position == move.StartPos)
+                            {
+                                blackPieces = blackPieces.Edit(i, modifiedKing);
+                                blackPieces = blackPieces.Edit(i, modifiedRook);
+                            }
+                        }
+                    }
+
+                    fields[move.StartPos] = new Piece(Empty, move.StartPos);
+                    fields[move.EndPos] = modifiedKing;
+                    fields[rookStartPos] = new Piece(Empty, rookStartPos);
+                    fields[rookEndPos] = modifiedRook;
+                    break;
+            }
+
 
             var newBoard = new Board(fields);
-            
-            var newState = new GameState(newBoard, whitePieces, blackPieces, move, canARankRookCastle, canHRankRookCastle);
+
+            var newState = new GameState(newBoard, whitePieces, blackPieces, move, canARankRookCastle,
+                canHRankRookCastle);
             return newState;
         }
     }

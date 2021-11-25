@@ -422,8 +422,6 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 moves = MC.CalcMovesForPiece(state, SecondPiece);
                 Console.WriteLine(moves.Count);
                 Console.WriteLine(moves[0]);
-
-                Assert.False(true);
         }
             
     }

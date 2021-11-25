@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
@@ -68,7 +69,10 @@ namespace ChessAI.DataClasses
         public Board(List<Piece> pieceList)
         {
             var fields = new Piece[Width * Height];
-            fields.Initialize();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                fields[i] = new Piece(Empty, i);
+            }
 
             foreach (var piece in pieceList)
             {
@@ -84,12 +88,13 @@ namespace ChessAI.DataClasses
 
         public bool IsFieldOwnedByWhite(byte position)
         {
-            return Fields[position].IsWhite;
+            return IsIndexValid(position) && Fields[position].IsWhite;
         }
 
         public bool IsFieldOccupied(byte position)
         {
-            return Fields[position].PieceType != Piece.Empty;
+            
+            return IsIndexValid(position) && Fields[position].PieceType != Empty;
         }
 
         public static bool IsIndexValid(byte index)
@@ -119,20 +124,6 @@ namespace ChessAI.DataClasses
 
             str += (ROW+1) ;
             return str;
-            /*
-            return (index % 8) switch
-            {
-                0x00 => "A" + ((index & 0xF0) + 1).ToString()[0],
-                0x01 => "B" + ((index & 0xF0) + 1).ToString()[0],
-                0x02 => "C" + ((index & 0xF0) + 1).ToString()[0],
-                0x03 => "D" + ((index & 0xF0) + 1).ToString()[0],
-                0x04 => "E" + ((index & 0xF0) + 1).ToString()[0],
-                0x05 => "F" + ((index & 0xF0) + 1).ToString()[0],
-                0x06 => "G" + ((index & 0xF0) + 1).ToString()[0],
-                0x07 => "H" + ((index & 0xF0) + 1).ToString()[0],
-                _ => throw new ArgumentException("Argument must be a valid index")
-            };
-            */
         }
 
         public static byte StringToIndex(string fieldName)
@@ -236,40 +227,31 @@ namespace ChessAI.DataClasses
             char[] Columns  = new char[]{'A','B','C','D','E','F','G','H'};
             char[] Rows     = new char[]{'1','2','3','4','5','6','7','8'};
             int rowNum = 7;
-            String str = "\t";
-            //for (int i = 0; i < Fields.Length; i++)
-            /*{
-                if (i % 0x10 == 0){
-                    str += "\n" + Rows[rowNum++] + ":";}
-                else if (i % 0x08 == 0){
-                    str += "\t";
-                }
-                str += "\t" + Fields[i].ToString();
-            }*/
-            
-            foreach(char c in Columns){
-                 str += c + "\t";
-            }
-            str +="\n\t";
+            StringBuilder strBuilder = new StringBuilder("\t");
 
             foreach(char c in Columns){
-                 str += "_\t";
+                 strBuilder.Append( c + "\t");
             }
-            str +="\n";
+            strBuilder.Append("\n\t");
+
+            foreach(char c in Columns){
+                 strBuilder.Append( "_\t");
+            }
+            strBuilder.Append("\n");
 
             int row, col;
             for (col = 0x70; col >=0 ; col-= 0x10)
             {
                 
-                str += Rows[rowNum--] + ":\t";
+                strBuilder.Append( Rows[rowNum--] + ":\t");
                 for (row = 0x00; row < 0x08; row+= 0x01)
                 {
-                   str += Fields[ (col + row) ].ToString() + "\t";
+                   strBuilder.Append( Fields[ (col + row) ].ToPrettyString() + "\t");
                 }
-                str += "\n";
+                strBuilder.Append( "\n");
             }
 
-            return str;
+            return strBuilder.ToString();
         }
     }
 

@@ -35,10 +35,10 @@ namespace UnitTests.DataClasses
 
             //test
             string test01 = Board.IndexToString(0x00);
-            Assert.AreEqual("A1", test01);
+            Assert.AreEqual("a1", test01);
 
             test01 = Board.IndexToString(0x77);
-            Assert.AreEqual("H8", test01);
+            Assert.AreEqual("h8", test01);
 
             byte[][] ranks = {
                 new byte[]{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
@@ -50,7 +50,7 @@ namespace UnitTests.DataClasses
                 new byte[]{ 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67 },
                 new byte[]{ 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77 }
             };
-            string[] files = { "A", "B", "C", "D", "E", "F", "G", "H" };
+            string[] files = { "a", "b", "c", "d", "e", "f", "g", "h" };
             
             for (int i = 0; i < ranks.Length; i++)
             {

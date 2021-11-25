@@ -113,20 +113,22 @@ namespace ChessAI.DataClasses
         /// This method performs no checks on the legality of the move, not even if the pieces required are
         /// actually there. This method should therefore only be called after the legality has been determined.
         /// </summary>
-        /// <param name="castlePosition">The position of the rook that is involved in the castling</param>
+        /// <param name="rookPosition">The position of the rook that is involved in the castling</param>
         /// <param name="state">The state of the game at the time of the move</param>
         /// <returns>
-        /// A new castling move that represents the king taking the castlePosition and the
+        /// A new castling move that represents the king taking the rookPosition and the
         /// occupying rook being moved in the appropriate direction
         /// </returns>
-        public static Move CreateCastleMove(byte castlePosition, GameState state)
+        public static Move CreateCastleMove(byte rookPosition, GameState state)
         {
-            var targetPiece = state.State[castlePosition];
+            var targetPiece = state.State[rookPosition];
 
             var kingIndex = Board.StartPositions[targetPiece.ColorAndType][0];
             var movePiece = state.State[kingIndex];
 
-            var move = new Move(kingIndex, castlePosition, Castling, movePiece, new Piece(Empty));
+            var endPos = (byte)(kingIndex - rookPosition > 0 ? rookPosition + 2 : rookPosition - 1);
+
+            var move = new Move(kingIndex, endPos, Castling, movePiece, new Piece(Empty));
             return move;
         }
 

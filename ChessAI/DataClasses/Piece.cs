@@ -94,6 +94,29 @@ namespace ChessAI.DataClasses
 
         public override string ToString()
         {
+            var builder = new StringBuilder();
+
+            builder.Append((PieceFlags & White) == White ? "White" : "Black");
+            builder.Append(" ");
+            builder.Append(
+                (PieceType) switch
+                {
+                    0 => "None",
+                    1 => "Pawn",
+                    2 => "Rook",
+                    3 => "Knight",
+                    4 => "Bishop",
+                    5 => "Queen",
+                    6 => "King",
+                    _ => "Invalid"
+                }
+            );
+
+            return builder.ToString();
+        }
+
+        public string ToPrettyString()
+        {
             string str ="";
             if(this.PieceType == Piece.Empty)
                 return ".";
@@ -118,26 +141,6 @@ namespace ChessAI.DataClasses
                 }
             }
             return str;
-
-            /*var builder = new StringBuilder();
-
-            builder.Append((PieceFlags & White) == White ? "White" : "Black");
-            builder.Append(" ");
-            builder.Append(
-                (PieceType) switch
-                {
-                    0 => "None",
-                    1 => "Pawn",
-                    2 => "Rook",
-                    3 => "Knight",
-                    4 => "Bishop",
-                    5 => "Queen",
-                    6 => "King",
-                    _ => "Invalid"
-                }
-            );
-
-            return builder.ToString();*/
         }
 
         public bool Equals(Piece other)
