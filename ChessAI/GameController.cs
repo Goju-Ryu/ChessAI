@@ -27,6 +27,8 @@ namespace ChessAI
             _io = new IO.IO();
             _isGameOver = false;
             _isPlayingWhite = isPlayingWhite;
+            
+            _io.SendIsDebugMode(true);
         }
 
 
@@ -61,7 +63,7 @@ namespace ChessAI
 
         private void PerformMoveActions(string moveString, ref GameState state)
         {
-            var enemyMove = Move.Parse(moveString, state, true); // TODO get move input
+            var enemyMove = Move.Parse(moveString, state, true);
 
             state = state.ApplyMove(enemyMove);
 
@@ -77,7 +79,7 @@ namespace ChessAI
             
             _io.SendMove(bestMove);
             state = state.ApplyMove(bestMove);
-            _io.PrintBoard(state);
+            _io.DebugPrintBoard(state);
         }
 
         private static (bool, Result?, string) IsGameOver(GameState state)

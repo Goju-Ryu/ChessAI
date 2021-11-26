@@ -44,9 +44,20 @@ namespace ChessAI.IO
             Console.Out.WriteLine(moveString);
             Console.Out.Flush();
         }
-        
 
-        public void PrintBoard(GameState state){
+        public void SendIsDebugMode(bool isDebug)
+        {
+            var debugVal = isDebug ? 1 : 0;
+            Console.Out.WriteLine("debug=" + debugVal);
+            Console.Out.Flush();
+        }
+
+        /// <summary>
+        /// Writes the state as a debug message.
+        /// </summary>
+        /// <param name="state">The state that is printed</param>
+        public void DebugPrintBoard(GameState state)
+        {
             Console.Out.WriteLine(state.State);
             Console.Out.Flush();
         }
@@ -58,8 +69,8 @@ namespace ChessAI.IO
         /// <param name="message"></param>
         public void SendError(string command, string message)
         {
-                Console.Out.WriteLine("Error (" + message + "): " + command);
-                Console.Out.Flush();
+            Console.Out.WriteLine("Error (" + message + "): " + command);
+            Console.Out.Flush();
         }
 
         /// <summary>
@@ -76,10 +87,11 @@ namespace ChessAI.IO
                 Draw => "1/2-1/2",
                 _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
             };
-            
-            Console.Out.WriteLine(winnerString + " {" +message+ "}");
+
+            Console.Out.WriteLine(winnerString + " {" + message + "}");
+            Console.Out.Flush();
         }
-        
+
         /// <summary>
         /// This function takes a string and returns true if and only if it represents a move
         /// as described in the XBoard manual

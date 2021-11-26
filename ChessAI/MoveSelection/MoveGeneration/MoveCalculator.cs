@@ -143,7 +143,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                     tempPos = (byte)(tempPos + dir);
                     if (!(Board.IsIndexValid(tempPos)))
                     {
-                        break;
+                        break; 
                     }
 
                     // IS Field Occupied , and if it is : is it occupied by myself or enemy? if enemy end loop after finish, else end now. 
@@ -223,7 +223,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
         private List<Move> genPawnMoves(GameState state, Piece piece)
         {
             List<Move> moves = new List<Move>();
-            bool isLowIndexed = Board.isDIrectionPositive(piece);
+            bool isLowIndexed = Board.IsDIrectionPositive(piece);
             int startIndex = isLowIndexed ? 0x10 : 0x60; // START INDEX IS LOW IF WHITE 
 
             int a = piece.Position - startIndex;
@@ -257,13 +257,13 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 if (Math.Abs(pos - piece.Position) % 0x10 == 0)
                 {
                     // STRAIGHT LINE 
-                    if (!board.IsFieldOccupied(pos))
+                    if (Board.IsIndexValid(pos) && !board.IsFieldOccupied(pos))
                         moves.Add(Move.CreateSimpleMove(piece.Position, pos, state)); // ONLY IF ISENT OCCUPIED
                 }
                 else
                 {
                     // DIAGONAL LINE 
-                    if (board.IsFieldOccupied(pos) && board.IsFieldOwnedByWhite(pos) &&
+                    if (Board.IsIndexValid(pos) && board.IsFieldOccupied(pos) && board.IsFieldOwnedByWhite(pos) &&
                         !piece.IsWhite) // ONLY IF DIAGONAL IS OCCUPIED BY ENEMY
                         moves.Add(Move.CreateSimpleMove(piece.Position, pos, state));
                 }
@@ -276,6 +276,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 {
                     break;
                 }
+                if(!Board.IsIndexValid((byte)i)) continue;
 
                 ValidatePosition((byte)moveArr[i], piece, state);
             }
@@ -295,7 +296,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 return null;
 
             bool isPos =
-                Board.isDIrectionPositive(
+                Board.IsDIrectionPositive(
                     piece); // TO CHECK FOR CASTLE MOVES WE MUST KNOW WICH SIDE OF THE BOARD TO LOOK FOR PIECES 
             int left = isPos
                 ? 0x00

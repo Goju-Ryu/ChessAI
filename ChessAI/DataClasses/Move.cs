@@ -52,7 +52,7 @@ namespace ChessAI.DataClasses
             public bool Equals(Move x, Move y)
             {
                 return x.MoveType == y.MoveType &&
-                       x.StartPos == y.StartPos && 
+                       x.StartPos == y.StartPos &&
                        x.EndPos == y.EndPos &&
                        x.MovePiece.Equals(y.MovePiece) &&
                        x.TargetPiece.Equals(y.TargetPiece);
@@ -116,9 +116,11 @@ namespace ChessAI.DataClasses
         /// </returns>
         public static Move CreateCastleMove(byte rookPosition, GameState state)
         {
-            var targetPiece = state.State[rookPosition];
+            //TODO fix this wrong implementation
+            var castleRook = state.State[rookPosition];
+            var isWhite = castleRook.IsWhite;
 
-            var kingIndex = Board.StartPositions[targetPiece.ColorAndType][0];
+            var kingIndex = Board.StartPositions[isWhite ? (byte)(White | King) : (byte)(Black | King)][0];
             var movePiece = state.State[kingIndex];
 
             var endPos = (byte)(kingIndex - rookPosition > 0 ? rookPosition + 2 : rookPosition - 1);
@@ -195,10 +197,16 @@ namespace ChessAI.DataClasses
             {
                 if (Math.Abs(startPos - endPos) == 2)
                 {
-                    var castlePos =
-                        (byte)((startPos - endPos) > 0
-                            ? endPos - 2
-                            : endPos + 1); //TODO Validate that this is correct calculation
+                    byte castlePos;
+                    if ((startPos - endPos) > 0)
+                    {
+                        castlePos = (byte)(endPos - 2);
+                    }
+                    else
+                    {
+                        castlePos = (byte)(endPos + 1);
+                    } //TODO Validate that this is correct calculation
+
                     return CreateCastleMove(castlePos, state);
                 }
             }

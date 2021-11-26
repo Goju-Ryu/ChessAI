@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ChessAI.DataClasses;
 using static ChessAI.DataClasses.Piece;
@@ -84,7 +85,7 @@ namespace UnitTests.DataClasses
         }
 
         [Test]
-        public void ApplyMoveTest()
+        public void ApplyOrdinaryMoveTest()
         {
             var state0 = new GameState(new Board(new[] { _rook, _pawn, _queen }.ToList()), false);
 
@@ -101,6 +102,40 @@ namespace UnitTests.DataClasses
             
             Assert.AreEqual(1, state3.WhitePieces.Length);
             Assert.Contains(_pawn, state3.WhitePieces.Pieces.ToArray());
+        }
+
+        [Test]
+        public void ApplyCastlingMoveTest()
+        {
+            var pieces = new List<Piece>(new[]
+            {
+                new Piece(White | Rook, 0x00), new Piece(White | King, Board.StartPositions[White | King][0])
+            });
+            var board = new Board(pieces);
+            var stateWhite = new GameState(board, true);
+            var castlingAsWhite = Move.CreateCastleMove(0, stateWhite);
+            var newStateWhite = stateWhite.ApplyMove(castlingAsWhite);
+             TestCastlingState(newStateWhite);
+             
+             
+            var stateBlack = new GameState(board, false);
+            var castlingAsBlack = Move.CreateCastleMove(0, stateBlack);
+            var newStateBlack = stateBlack.ApplyMove(castlingAsBlack);
+            TestCastlingState(newStateBlack);
+           
+            
+            void TestCastlingState(GameState state)
+            {
+                Assert.AreEqual(Empty, state.State[0].PieceType);
+                Assert.AreEqual(Empty, state.State[1].PieceType);
+                Assert.AreEqual(White | King, state.State[2].ColorAndType);
+                Assert.AreEqual(White | Rook, state.State[3].ColorAndType);
+
+                for (int i = 4; i < state.State.Fields.Length; i++)
+                {
+                    Assert.AreEqual(Empty, state.State[i].PieceType);
+                }
+            }
         }
 
 

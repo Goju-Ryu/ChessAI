@@ -94,7 +94,7 @@ namespace ChessAI.DataClasses
         public bool IsFieldOccupied(byte position)
         {
             
-            return IsIndexValid(position) && Fields[position].PieceType != Empty;
+            return !IsIndexValid(position) || Fields[position].PieceType != Empty;
         }
 
         public static bool IsIndexValid(byte index)
@@ -216,7 +216,7 @@ namespace ChessAI.DataClasses
         }
 
         // TODO DOUBLE CHECK THIS IS CORRECT 
-        public static bool isDIrectionPositive(Piece piece)
+        public static bool IsDIrectionPositive(Piece piece)
         {
             return piece.IsWhite;
         }
@@ -227,12 +227,12 @@ namespace ChessAI.DataClasses
             char[] Columns  = new char[]{'A','B','C','D','E','F','G','H'};
             char[] Rows     = new char[]{'1','2','3','4','5','6','7','8'};
             int rowNum = 7;
-            StringBuilder strBuilder = new StringBuilder("\t");
+            StringBuilder strBuilder = new StringBuilder("#\t");
 
             foreach(char c in Columns){
                  strBuilder.Append( c + "\t");
             }
-            strBuilder.Append("\n\t");
+            strBuilder.Append("\n#\t");
 
             foreach(char c in Columns){
                  strBuilder.Append( "_\t");
@@ -243,7 +243,7 @@ namespace ChessAI.DataClasses
             for (col = 0x70; col >=0 ; col-= 0x10)
             {
                 
-                strBuilder.Append( Rows[rowNum--] + ":\t");
+                strBuilder.Append( "#" + Rows[rowNum--] + ":\t");
                 for (row = 0x00; row < 0x08; row+= 0x01)
                 {
                    strBuilder.Append( Fields[ (col + row) ].ToPrettyString() + "\t");

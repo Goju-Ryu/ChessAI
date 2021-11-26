@@ -11,7 +11,7 @@ namespace ChessAI
             var arg = args.Length > 0 ? args[0] : "10";
             
             var gameController = new GameController(false, TimeSpan.FromSeconds(int.Parse(arg)));
-
+            
             gameController.GameLoop();
         }
     }

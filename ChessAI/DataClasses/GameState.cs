@@ -180,7 +180,7 @@ namespace ChessAI.DataClasses
 
                     fields[move.StartPos] = new Piece(Empty, move.StartPos);
                     fields[move.EndPos] = modifiedMovePiece;
-                    if (move.EndPos != move.TargetPiece.Position)
+                    if ( move.TargetPiece.PieceType != Empty && move.EndPos != move.TargetPiece.Position)
                     {
                         fields[move.TargetPiece.Position] = new Piece(Empty, move.TargetPiece.Position);
                     }
@@ -191,7 +191,7 @@ namespace ChessAI.DataClasses
                     var rookStartPos = move.StartPos - move.EndPos < 0 ? move.EndPos + 1 : move.EndPos - 2;
                     var rookEndPos = move.StartPos - move.EndPos > 0 ? move.EndPos + 1 : move.EndPos - 2;
                     var modifiedKing = new Piece(move.MovePiece.Content, move.EndPos);
-                    var modifiedRook = new Piece(State[move.EndPos].Content, rookEndPos);
+                    var modifiedRook = new Piece(State[rookStartPos].Content, rookEndPos);
 
                     if (move.MovePiece.IsWhite)
                     {
@@ -200,6 +200,10 @@ namespace ChessAI.DataClasses
                             if (whitePieces[i].Position == move.StartPos)
                             {
                                 whitePieces = whitePieces.Edit(i, modifiedKing);
+                            }
+
+                            if (whitePieces[i].Position == rookStartPos)
+                            {
                                 whitePieces = whitePieces.Edit(i, modifiedRook);
                             }
                         }
@@ -211,6 +215,10 @@ namespace ChessAI.DataClasses
                             if (blackPieces[i].Position == move.StartPos)
                             {
                                 blackPieces = blackPieces.Edit(i, modifiedKing);
+                            }
+
+                            if (blackPieces[i].Position == rookStartPos)
+                            {
                                 blackPieces = blackPieces.Edit(i, modifiedRook);
                             }
                         }
