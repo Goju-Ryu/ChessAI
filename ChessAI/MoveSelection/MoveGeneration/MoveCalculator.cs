@@ -196,7 +196,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 tempPos = (byte)(piece.Position + horseMoves[i]);
 
                 if (!Board.IsIndexValid(tempPos)) // isnot Valid
-                    break;
+                    continue;
 
                 if (state.State.IsFieldOccupied(tempPos))
                 {
@@ -274,7 +274,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
                 // TODO change to Board Max FIeld OR SOMETHING
                 if ((byte)moveArr[i] == 255)
                 {
-                    break;
+                    continue;
                 }
                 if(!Board.IsIndexValid((byte)i)) continue;
 
