@@ -7,12 +7,27 @@ using ChessAI.MoveSelection.MoveGeneration;
 
 
 namespace UnitTests.MoveSelection.MoveGeneration {
-    public class MoveCalculaterTest {
+    public class MoveCalculatorTest {
+
+        [Test]
+        public void InitialStateTest()
+        {
+            var state = GameState.CreateNewGameState(false);
+            var moveCalculator = new MoveCalculator();
+
+            var movesWhite = moveCalculator.CalculatePossibleMoves(state, true);
+            var movesBlack = moveCalculator.CalculatePossibleMoves(state, false);
+            
+            Assert.Greater(movesWhite.Count, 0);
+            Assert.Greater(movesBlack.Count, 0);
+            Assert.AreEqual(movesBlack.Count, movesWhite.Count);
+        }
+        
         
         [Test]
         public void DiagonalMoves(){
             
-            void testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            void TestWithObstructions(byte[] l, byte OBScolor ,int exspectedNum){
 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.Bishop ^ Piece.Black  , 0x44 ) );
@@ -42,15 +57,15 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             int[] exspectedMovesENEMY = { 13, 10 , 8, 6, 4 };
             for (int i = 0; i < obstructions.Count; i++)
             {
-                testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i] );
-                testWithobstructions( obstructions[i] , Piece.White , exspectedMovesENEMY[i] );
+                TestWithObstructions( obstructions[i] , Piece.Black , exspectedMoves[i] );
+                TestWithObstructions( obstructions[i] , Piece.White , exspectedMovesENEMY[i] );
             }
         }
     
         [Test]
         public void LineMoves(){
             
-            void testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            void TestWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
                 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.Rook ^ Piece.Black  , 0x44 ) );
@@ -85,15 +100,15 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
             for (int i = 0; i < obstructions.Count; i++)
             {
-                testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]      );
-                testWithobstructions( obstructions[i] , Piece.White , exspectedMovesENEMY[i] );
+                TestWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]      );
+                TestWithobstructions( obstructions[i] , Piece.White , exspectedMovesENEMY[i] );
             }
           
         }
 
         [Test]
         public void HorseMoves(){
-            void testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            void TestWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
                 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.Knight ^ Piece.Black  , 0x44 ) );
@@ -127,8 +142,8 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             for (int i = 0; i < obs.Count; i++)
             {
                 Console.WriteLine(8 - i);
-                testWithobstructions( obs[i] , Piece.Black , (8 - i) );
-                testWithobstructions( obs[i] , Piece.White ,  8      );
+                TestWithobstructions( obs[i] , Piece.Black , (8 - i) );
+                TestWithobstructions( obs[i] , Piece.White ,  8      );
             }
 
         }
@@ -136,7 +151,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         [Test]
         public void QueenMoves(){
             
-            void testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            void TestWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
                 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.Queen ^ Piece.Black  , 0x00 ) );
@@ -170,9 +185,9 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             for (int i = 0; i < obstructions.Count; i++)
             {
                 Console.WriteLine("ITERATION" + i);
-                testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
+                TestWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
                  Console.WriteLine("ITERATION" + i);
-                testWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
+                TestWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
             }
           
         }
@@ -180,7 +195,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         [Test]
         public void KingMoves(){
             
-            List<Move> testWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
+            List<Move> TestWithobstructions(byte[] l, byte OBScolor ,int exspectedNum){
                 
                 List<Piece> pieces = new List<Piece>();
                 pieces.Add ( new Piece( Piece.King ^ Piece.Black  , 0x44 ) );
@@ -219,8 +234,8 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
             for (int i = 0; i < obstructions.Count; i++)
             {
-                Friendly = testWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
-                Hostile  = testWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
+                Friendly = TestWithobstructions( obstructions[i] , Piece.Black , exspectedMoves[i]     );
+                Hostile  = TestWithobstructions( obstructions[i] , Piece.White , exspectedMoves[i] + i );
             }
 
             for (int i = 0; i < Friendly.Count; i++)
@@ -278,20 +293,15 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         public void PawnMoves_02 (){
 
             List<Piece> pieces = new List<Piece>();
-            Board board;
-            GameState state;
-            MoveCalculator MC;
-            List<Move> moves ;
-
             pieces.Add ( new Piece( Piece.Pawn ^ Piece.Black, 0x43 ) );
             pieces.Add ( new Piece( Piece.Pawn ^ Piece.White, 0x34 ) );
             
-            board = TestBuilder.GenerateBoard(pieces);
-            state = new GameState(board, false);
+            
+            Board  board = TestBuilder.GenerateBoard(pieces);
+            var state = new GameState(board, false);
+            var MC = new MoveCalculator();
 
-            MC = new MoveCalculator();
-
-            moves = MC.CalculatePossibleMoves(state, false);
+            var moves = MC.CalculatePossibleMoves(state, false);
             moves.AddRange( MC.CalculatePossibleMoves(state, true) );
             //Assert.AreEqual(2,moves.Count);
 
@@ -302,7 +312,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
         }
 
         [Test]
-        public void testConvertion(){
+        public void TestConvertion(){
             
             List<(int,int)> convertions = new List<(int, int)>();
             int Row1 = 0x00; 
@@ -325,8 +335,8 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             convertions.Add( ( 0x11 , 0x66 ) );
             convertions.Add( ( 0x16 , 0x61 ) );
 
-            testConverstions(convertions);
-            void testConverstions(List<(int,int)> list){
+            TestConverstions(convertions);
+            void TestConverstions(List<(int,int)> list){
             
                 List<Piece> pieces = new List<Piece>();
                 foreach ((int,int) I in list)
