@@ -101,6 +101,7 @@ namespace ChessAI.DataClasses
 
         public static bool IsWhite = true;
 
+        //TODO allow for stack allocated variant taking a span as argument to use for board?
         /**
          * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
          * <param name="move">The move that should be applied to a state</param>

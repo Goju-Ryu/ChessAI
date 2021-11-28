@@ -9,7 +9,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ChessAI\ChessAI.csproj" />
-      <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

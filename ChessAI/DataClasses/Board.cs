@@ -39,7 +39,7 @@ namespace ChessAI.DataClasses
             { Black | King, new byte[] { 0x73 } }
         }.ToImmutableDictionary();
 
-        private readonly Piece[] _fields; //TODO consider replacing this array with a stack allocated ReadOnlySpan<T>
+        private readonly Piece[] _fields;
 
         /// <summary>
         /// A constructor taking an array of pieces representing the board. Note that the array length must

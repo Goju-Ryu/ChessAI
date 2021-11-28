@@ -23,6 +23,7 @@ namespace ChessAI.MoveSelection.StateAnalysis
             return targetValue;
         }
 
+        //TODO this move sorting gives too little compared to what it saves
         public void SortMovesByBest(GameState state, List<Move> moves, Move previousBest)
         {
             QuickSort(state, previousBest, CollectionsMarshal.AsSpan(moves));

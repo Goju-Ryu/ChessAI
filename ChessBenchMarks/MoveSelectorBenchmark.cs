@@ -1,50 +1,73 @@
 using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using ChessAI.DataClasses;
 using ChessAI.MoveSelection;
 using ChessAI.MoveSelection.MoveGeneration;
 using ChessAI.MoveSelection.StateAnalysis;
-using NUnit.Framework;
-using UnitTests;
 
 namespace BenchMarks
 {
     [MemoryDiagnoser]
     public class MoveSelectorBenchmark
     {
-        [Params(1, 2, 3, 4, 6)] //todo try deeper depths when they can be auto generated 
-        public int Depth { get; set; }
-        [Params(0, 6, 12)]
-        public int InitialPathArraySize { get; set; }
+        [Params(2, 3, 4, 6)] public int Depth { get; set; }
 
-        public MoveSelector MoveSelector;
-        
-        private IMoveAnalyser _moveAnalyser;
+        [Params(0, 3, 6)] public int InitialPathArraySize { get; set; }
+
+        [ParamsSource(nameof(MoveAnalyserSource))]
+        public IMoveAnalyser MoveAnalyser { get; set; }
+
         private IMoveCalculator _moveCalculator;
         private IStateAnalyser _stateAnalyser;
+        private MoveSelector _moveSelector;
+
+
+        public IEnumerable<IMoveAnalyser> MoveAnalyserSource()
+        {
+            yield return new MoveAnalyserDummy();
+            yield return new MoveAnalyserFast();
+        }
+
 
         public MoveSelectorBenchmark()
         {
-            //TODO switch out the interfaces with actual implementations once they are ready
-            var moveAndStateProvider = new MoveCalculatorStateAnalyserStub();
-            _moveAnalyser = new MoveAnalyserStub();
-            _moveCalculator = moveAndStateProvider;
-            _stateAnalyser = moveAndStateProvider;
+            _moveCalculator = new MoveCalculator();
+            _stateAnalyser = new StateAnalyserSimple();
         }
 
         [GlobalSetup]
-        public void Setup()
+        public void SetUp()
         {
-            MoveSelector = 
-                new MoveSelector(true, _stateAnalyser, _moveAnalyser, _moveCalculator, InitialPathArraySize);
+            _moveSelector = new MoveSelector(false, _stateAnalyser, MoveAnalyser, _moveCalculator,
+                InitialPathArraySize);
+        }
+
+
+        [Benchmark]
+        public Move BestMove()
+        {
+            return _moveSelector.BestMove(GameState.CreateNewGameState(false), Depth);
         }
 
         [Benchmark]
-        public Move BestMove() => MoveSelector.BestMove(new GameState(), Depth);
+        public Move BestMoveImproved()
+        {
+            return _moveSelector.BestMoveImproved(GameState.CreateNewGameState(false), Depth);
+        }
 
         [Benchmark]
-        public Move BestMoveIterative() =>
-            MoveSelector.BestMoveIterative(new GameState(), TimeSpan.FromSeconds(30), Depth);
+        public Move BestMoveIterative()
+        {
+            return _moveSelector.BestMoveIterative(
+                GameState.CreateNewGameState(false), TimeSpan.FromSeconds(30), Depth);
+        }
 
+        [Benchmark]
+        public Move BestMoveIterativeImproved()
+        {
+            return _moveSelector.BestMoveIterativeImproved(GameState.CreateNewGameState(false),
+                TimeSpan.FromSeconds(30), Depth);
+        }
     }
 }
