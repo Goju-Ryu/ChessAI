@@ -53,7 +53,7 @@ namespace ChessAI.MoveSelection.StateAnalysis
 
             // if black transform position to correct index index
             var index =
-                (piece.PieceFlags & Piece.White) != Piece.White
+                !piece.IsWhite
                     ? IndexTransformer(position)
                     : position;
 
