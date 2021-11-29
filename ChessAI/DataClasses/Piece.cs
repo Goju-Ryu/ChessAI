@@ -16,7 +16,8 @@ namespace ChessAI.DataClasses
         /// towards the least significant on
         /// 
         ///<code>
-        ///     unused:         2 bits
+        ///     unused:         1 bit
+        ///     has moved       1 bit
         ///     challenges:     1 bit
         ///     is challenged:  1 bit
         ///     is white:       1 bit
@@ -30,11 +31,11 @@ namespace ChessAI.DataClasses
         /// </summary>
         public byte Content => _piece;
 
-        public byte PieceFlags => (byte)(_piece & 0b1111_1000);
+        public byte PieceFlags => (byte)(_piece & 0b1111_0000);
         public byte PieceType => (byte)(_piece & PieceMask);
         public byte ColorAndType => (byte)(_piece & 0x0f);
-        public bool IsWhite => (PieceFlags & White) == White;
-
+        public bool IsWhite => (_piece & White) == White;
+        public bool HasFlag(byte flag) => (PieceFlags & flag) == flag;
         
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace ChessAI.DataClasses
         /// If a position doesn't make sense or is unknown for this piece an invalid index is set instead.
         /// </summary>
         public byte Position { get; }
-        public bool hasMoved => (_piece & beenMovedFlag) != 0;
+        public bool hasMoved => (_piece & BeenMovedFlag) != 0;
 
         /// <summary>
         /// Base constructor with all arguments given and as the correct type
@@ -74,6 +75,7 @@ namespace ChessAI.DataClasses
 
         public const byte Empty = 0;
         public const byte PieceMask = 0b0111;
+        public const byte FlagMask = 0b1111_0000;
 
         // Piece definitions
         public const byte Pawn   = 0b0001;
@@ -89,14 +91,16 @@ namespace ChessAI.DataClasses
         public const byte White = 0b1000;
         public const byte Black = 0;
 
-        // movedFlad
-        public const byte beenMovedFlag = 0b0100_0000;
-
+        // movedFlag
+        public const byte BeenMovedFlag = 0b0100_0000;
+        public const byte ChallengesOtherFlag = 0b0010_0000;
+        public const byte ChallengedFlag = 0b0001_0000;
+        
         public override string ToString()
         {
             var builder = new StringBuilder();
 
-            builder.Append((PieceFlags & White) == White ? "White" : "Black");
+            builder.Append(IsWhite ? "White" : "Black");
             builder.Append(" ");
             builder.Append(
                 (PieceType) switch
@@ -118,26 +122,26 @@ namespace ChessAI.DataClasses
         public string ToPrettyString()
         {
             string str ="";
-            if(this.PieceType == Piece.Empty)
+            if(PieceType == Empty)
                 return ".";
 
-            if(this.IsWhite){
-                switch(this.PieceType){
-                    case Piece.Pawn:    str += "|p|";     break;   
-                    case Piece.Rook:    str += "|r|";     break;
-                    case Piece.Knight:  str += "|k|";     break;
-                    case Piece.Bishop:  str += "|b|";     break;
-                    case Piece.Queen:   str += "|q|";     break;
-                    case Piece.King:    str += "|K|";     break;
+            if(IsWhite){
+                switch(PieceType){
+                    case Pawn:    str += "|p|";     break;   
+                    case Rook:    str += "|r|";     break;
+                    case Knight:  str += "|k|";     break;
+                    case Bishop:  str += "|b|";     break;
+                    case Queen:   str += "|q|";     break;
+                    case King:    str += "|K|";     break;
                 }
             }else{
-                switch(this.PieceType){
-                    case Piece.Pawn:    str += "p";     break;   
-                    case Piece.Rook:    str += "r";     break;
-                    case Piece.Knight:  str += "k";     break;
-                    case Piece.Bishop:  str += "b";     break;
-                    case Piece.Queen:   str += "q";     break;
-                    case Piece.King:    str += "k";     break;
+                switch(PieceType){
+                    case Pawn:    str += "p";     break;   
+                    case Rook:    str += "r";     break;
+                    case Knight:  str += "k";     break;
+                    case Bishop:  str += "b";     break;
+                    case Queen:   str += "q";     break;
+                    case King:    str += "k";     break;
                 }
             }
             return str;
@@ -178,15 +182,15 @@ namespace ChessAI.DataClasses
         public static Piece operator ^(byte a, Piece b) => new Piece((byte)(a ^ b._piece));
 
         // Equality
-        public static bool operator ==(Piece a, Piece b) => a._piece == b._piece;
+        public static bool operator ==(Piece a, Piece b) => a.ColorAndType == b.ColorAndType && a.Position == b.Position;
         public static bool operator ==(byte a, Piece b) => a == b._piece;
-        public static bool operator ==(Piece a, byte b) => a._piece == b;
-        public static bool operator !=(Piece a, Piece b) => a._piece != b._piece;
-        public static bool operator !=(byte a, Piece b) => a != b._piece;
-        public static bool operator !=(Piece a, byte b) => a._piece != b;
-        public static bool operator ==(int a, Piece b) => a == b._piece;
-        public static bool operator ==(Piece a, int b) => a._piece == b;
-        public static bool operator !=(int a, Piece b) => a != b._piece;
-        public static bool operator !=(Piece a, int b) => a._piece != b;
+        public static bool operator ==(Piece a, byte b) => b == a;
+        public static bool operator !=(Piece a, Piece b) => !(a == b);
+        public static bool operator !=(byte a, Piece b) => !(a == b);
+        public static bool operator !=(Piece a, byte b) => !(a == b);
+        public static bool operator ==(int a, Piece b) => (byte)a == b;
+        public static bool operator ==(Piece a, int b) => b == a;
+        public static bool operator !=(int a, Piece b) => !(a == b);
+        public static bool operator !=(Piece a, int b) => !(a == b);
     }
 }

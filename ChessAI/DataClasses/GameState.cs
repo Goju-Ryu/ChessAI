@@ -54,7 +54,7 @@ namespace ChessAI.DataClasses
                         tempBoardFields[index] = currentPiece;
                     }
 
-                    if ((currentPiece.PieceFlags & White) == White)
+                    if ((currentPiece.ColorAndType & White) == White)
                     {
                         tempWhitePieceList.Add(currentPiece);
                     }
@@ -100,7 +100,7 @@ namespace ChessAI.DataClasses
         public readonly bool CanHRankRookCastle;
 
         public static bool IsWhite = true;
-        
+
         /**
          * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
          * <param name="move">The move that should be applied to a state</param>
@@ -150,26 +150,37 @@ namespace ChessAI.DataClasses
             // Update PieceLists
             PieceList whitePieces = WhitePieces;
             PieceList blackPieces = BlackPieces;
-            
+
             State.Fields.CopyTo(fields);
 
             switch (move.MoveType)
             {
                 case MoveType.Ordinary:
                 case MoveType.EnPeasant:
-                    if (move.TargetPiece != Empty)
+                    if (move.TargetPiece.PieceType != Empty)
                     {
                         if (move.TargetPiece.IsWhite)
                         {
+                            WhitePieces.EditInPlace(move.TargetPiece,
+                                (byte)(move.TargetPiece.PieceFlags | ChallengedFlag));
+                            BlackPieces.EditInPlace(move.MovePiece,
+                                (byte)(move.MovePiece.PieceFlags | ChallengesOtherFlag));
+
                             whitePieces = WhitePieces.Minus(move.TargetPiece);
                         }
                         else
                         {
+                            BlackPieces.EditInPlace(move.TargetPiece,
+                                (byte)(move.TargetPiece.PieceFlags | ChallengedFlag));
+                            WhitePieces.EditInPlace(move.MovePiece,
+                                (byte)(move.MovePiece.PieceFlags | ChallengesOtherFlag));
+
                             blackPieces = BlackPieces.Minus(move.TargetPiece);
                         }
                     }
 
-                    var modifiedMovePiece = new Piece(move.MovePiece.Content, move.EndPos);
+                    // The modified piece carries over no flags as we do not know if they are still true
+                    var modifiedMovePiece = new Piece(move.MovePiece.ColorAndType, move.EndPos);
                     if (move.MovePiece.IsWhite)
                     {
                         for (byte i = 0; i < whitePieces.Length; i++)
@@ -193,9 +204,17 @@ namespace ChessAI.DataClasses
 
                     fields[move.StartPos] = new Piece(Empty, move.StartPos);
                     fields[move.EndPos] = modifiedMovePiece;
-                    if ( move.TargetPiece.PieceType != Empty && move.EndPos != move.TargetPiece.Position)
+                    if (move.TargetPiece.PieceType != Empty)
                     {
-                        fields[move.TargetPiece.Position] = new Piece(Empty, move.TargetPiece.Position);
+                        var target = move.TargetPiece;
+                        
+                        State.Fields[target.Position] =
+                            new Piece(State[target.Position].Content | ChallengedFlag, target.Position);
+                        
+                        if (move.EndPos != target.Position)
+                        {
+                            fields[target.Position] = new Piece(Empty, target.Position);
+                        }
                     }
 
                     break;

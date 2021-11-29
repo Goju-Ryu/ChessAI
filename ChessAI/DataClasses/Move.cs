@@ -94,7 +94,7 @@ namespace ChessAI.DataClasses
         {
             var movePiece = state.State[startPos];
             var enemyPiece = state.State[enemyPos];
-            var enemyDirection = (enemyPiece.PieceFlags & White) == White
+            var enemyDirection = enemyPiece.IsWhite
                 ? Board.WhiteDirection(Direction.Up)
                 : Board.BlackDirection(Direction.Up);
             var endPos = (byte)(enemyPos - enemyDirection);
