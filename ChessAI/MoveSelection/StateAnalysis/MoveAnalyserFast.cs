@@ -24,6 +24,7 @@ namespace ChessAI.MoveSelection.StateAnalysis
         }
 
         //TODO this move sorting gives too little compared to what it saves
+        //TODO to alleviate this we could try to use piece flags, though it would require setting them first
         public void SortMovesByBest(GameState state, List<Move> moves, Move previousBest)
         {
             QuickSort(state, previousBest, CollectionsMarshal.AsSpan(moves));

@@ -6,7 +6,7 @@ using static ChessAI.DataClasses.Piece;
 
 namespace ChessAI.DataClasses
 {
-    public readonly struct Board
+    public readonly ref struct Board
     {
         private const byte Width = 0x10;
         private const byte Height = 0x8;
@@ -39,7 +39,27 @@ namespace ChessAI.DataClasses
             { Black | King, new byte[] { 0x73 } }
         }.ToImmutableDictionary();
 
-        private readonly Piece[] _fields;
+        private readonly Span<Piece> _fields;
+
+        /// <summary>
+        /// A constructor taking a <see cref="Span{T}"/> of pieces representing the board. Note that the span length must
+        /// be consistent with an 0x88 board.
+        /// </summary>
+        /// <param name="fields">a span representing the board</param>
+        /// <exception cref="ArgumentException">thrown if the given array is not of the right length</exception>
+        public Board(Span<Piece> fields)
+        {
+            var expectedSize = Width * Height;
+            if (fields.Length != expectedSize)
+            {
+                throw new ArgumentException(
+                    "fields must be an array of length 0x" + expectedSize.ToString("X") + " / 0d" + expectedSize +
+                    " but the provided array had length 0x" + fields.Length.ToString("X") + " / 0d" + fields.Length
+                );
+            }
+
+            _fields = fields;
+        }
 
         /// <summary>
         /// A constructor taking an array of pieces representing the board. Note that the array length must
@@ -84,7 +104,7 @@ namespace ChessAI.DataClasses
 
         public Piece this[int i] => Fields[i];
 
-        public ReadOnlySpan<Piece> Fields => _fields.AsSpan();
+        public Span<Piece> Fields => _fields; //.AsSpan();
 
         public bool IsFieldOwnedByWhite(byte position)
         {

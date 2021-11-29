@@ -83,7 +83,7 @@ namespace ChessAI.MoveSelection
             }
 
 
-            MinMax(depth, 0, true, state);
+            MinMaxImproved(depth, 0, true, state);
 
             return BestMoves[0];
         }
@@ -106,7 +106,7 @@ namespace ChessAI.MoveSelection
                     BestMoves.CopyTo(newArray, 0);
                     BestMoves = newArray;
                 }
-                MinMax(depth, 0, true, state);
+                MinMaxImproved(depth, 0, true, state);
             }
 
 
@@ -203,6 +203,84 @@ namespace ChessAI.MoveSelection
                     var move = moves[index];
                     var child = state.ApplyMove(move);
                     var value = MinMax(searchDepth, currentDepth + 1, true, child, alpha, beta);
+
+                    if (value < beta)
+                    {
+                        beta = value;
+
+                        if (alpha >= beta)
+                        {
+                            return beta;
+                        }
+
+                        BestMoves[currentDepth] = move;
+                    }
+                }
+
+                return beta;
+            }
+        }
+        
+        /**
+         * <summary>
+         * The implementation of the minMax algorithm using alpha pruning that we can use to search for the best move
+         * </summary>
+         * <param name="searchDepth">The desired depth to which it should search</param>
+         * <param name="currentDepth">The depth of the current node</param>
+         * <param name="isMaximizer">A value deciding which role the node takes on; maximiser or minimiser</param>
+         * <param name="state">The state of the game as it would look all moves leading to this node were taken</param>
+         * <param name="alpha">The value storing the maximiser's current best value</param>
+         * <param name="beta">The value storing the minimiser's current best value</param>
+         * <returns>The evaluation value of the best outcome</returns>
+         */
+        protected int MinMaxImproved(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
+            int alpha = int.MinValue, int beta = int.MaxValue)
+        {
+            //TODO Change flags of pieces in the previous state according to 
+            if (searchDepth <= currentDepth)
+            {
+                return _stateAnalyser.StaticAnalysis(state, _isWhite);
+            }
+
+            // Generate moves, sort them and remove the previous best move to avoid
+            // it being used in other branches than the best
+            var moves = _moveCalculator.CalculatePossibleMoves(state, _isWhite == isMaximizer);
+            _moveAnalyser.SortMovesByBest(state, moves, BestMoves[currentDepth]);
+
+            if (isMaximizer)
+            {
+                Span<Piece> childBoardSpan = stackalloc Piece[0x80];
+                for (var index = 0; index < moves.Count; index++)
+                {
+                    ++NodesVisited;
+                    var move = moves[index];
+                    var child = state.ApplyMove(move, childBoardSpan);
+                    var value = MinMaxImproved(searchDepth, currentDepth + 1, false, child, alpha, beta);
+
+                    if (value > alpha)
+                    {
+                        alpha = value;
+
+                        if (alpha >= beta)
+                        {
+                            return alpha;
+                        }
+
+                        BestMoves[currentDepth] = move;
+                    }
+                }
+
+                return alpha;
+            }
+            else
+            {
+                Span<Piece> childBoardSpan = stackalloc Piece[0x80];
+                for (var index = 0; index < moves.Count; index++)
+                {
+                    ++NodesVisited;
+                    var move = moves[index];
+                    var child = state.ApplyMove(move, childBoardSpan);
+                    var value = MinMaxImproved(searchDepth, currentDepth + 1, true, child, alpha, beta);
 
                     if (value < beta)
                     {

@@ -100,14 +100,27 @@ namespace ChessAI.DataClasses
         public readonly bool CanHRankRookCastle;
 
         public static bool IsWhite = true;
-
-        //TODO allow for stack allocated variant taking a span as argument to use for board?
+        
         /**
          * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
          * <param name="move">The move that should be applied to a state</param>
          * <returns>A new <see cref="GameState"/> with the move applied</returns>
          */
         public GameState ApplyMove(Move move)
+        {
+            var fields = new Piece[State.Fields.Length];
+
+            return ApplyMove(move, fields);
+        }
+
+
+        /**
+         * <summary>A dummy method representing some logic to calculate the applying a move to the state</summary>
+         * <param name="move">The move that should be applied to a state</param>
+         * <param name="fields">A span of pieces that represents the board. Should always be at least 16*8 (128) long</param>
+         * <returns>A new <see cref="GameState"/> with the move applied</returns>
+         */
+        public GameState ApplyMove(Move move, Span<Piece> fields)
         {
             var canARankRookCastle = CanARankRookCastle;
             var canHRankRookCastle = CanHRankRookCastle;
@@ -137,8 +150,7 @@ namespace ChessAI.DataClasses
             // Update PieceLists
             PieceList whitePieces = WhitePieces;
             PieceList blackPieces = BlackPieces;
-
-            var fields = new Piece[State.Fields.Length];
+            
             State.Fields.CopyTo(fields);
 
             switch (move.MoveType)

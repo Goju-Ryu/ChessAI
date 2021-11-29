@@ -83,7 +83,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
                 List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
-                Console.Write(board + "\n\n\n");
+                Console.Write(board.ToString() + "\n\n\n");
                 Assert.AreEqual( exspectedNum , moves.Count );
             }
 
@@ -169,7 +169,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
 
                 List<Move> moves = MC.CalculatePossibleMoves(state, false);
 
-                Console.Write(board + "\n\n\n");
+                Console.Write(board.ToString() + "\n\n\n");
                 Assert.AreEqual( exspectedNum , moves.Count );
             }
 
@@ -285,7 +285,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             MC = new MoveCalculator();
             moves = MC.CalculatePossibleMoves(state, isWhite);
 
-            Console.WriteLine(board);
+            Console.WriteLine(board.ToString());
             Assert.AreEqual(expected,moves.Count);
         }
 
@@ -306,7 +306,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
             //Assert.AreEqual(2,moves.Count);
 
 
-            Console.WriteLine(board);
+            Console.WriteLine(board.ToString());
        
 
         }
@@ -363,7 +363,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 }
 
                 Board board = TestBuilder.GenerateBoard(pieces);
-                Console.WriteLine("BOARD \n" + board);
+                Console.WriteLine("BOARD \n" + board.ToString());
 
             }           
         }
@@ -423,7 +423,7 @@ namespace UnitTests.MoveSelection.MoveGeneration {
                 MoveCalculator MC = new MoveCalculator();
                 GameState state = new GameState(board, false);
 
-            Console.WriteLine(board);
+            Console.WriteLine(board.ToString());
                 
                 List<Move> moves = MC.CalcMovesForPiece(state, MAINPIECE);
                 Console.WriteLine(moves.Count);

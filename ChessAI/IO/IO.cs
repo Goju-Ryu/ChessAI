@@ -58,7 +58,7 @@ namespace ChessAI.IO
         /// <param name="state">The state that is printed</param>
         public void DebugPrintBoard(GameState state)
         {
-            Console.Out.WriteLine(state.State);
+            Console.Out.WriteLine(state.State.ToString());
             Console.Out.Flush();
         }
 

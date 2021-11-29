@@ -8,6 +8,7 @@ namespace ChessAI.MoveSelection.MoveGeneration
     // Moves Implementation 
     public class MoveCalculator : IMoveCalculator
     {
+        //TODO reduce number of lists generated
         public List<Move> CalculatePossibleMoves(GameState state, bool calculateForWhite)
         {
             List<Move> moves = new List<Move>();

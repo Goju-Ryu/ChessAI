@@ -145,10 +145,10 @@ namespace UnitTests.DataClasses
 
             for (int i = 0; i < columns.Length; i++)
             {
-                checkEquals(columns[i] + rows[i]);
+                checkEquals(columns[i] + rows[i], b);
             }
 
-            void checkEquals(int INDEX)
+            void checkEquals(int INDEX, Board b)
             {
                 Piece p = b[INDEX];
                 Piece a = b.Fields[p.Position];
