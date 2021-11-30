@@ -236,7 +236,6 @@ namespace ChessAI.MoveSelection
         protected int MinMaxImproved(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
             int alpha = int.MinValue, int beta = int.MaxValue)
         {
-            //TODO Change flags of pieces in the previous state according to 
             if (searchDepth <= currentDepth)
             {
                 return _stateAnalyser.StaticAnalysis(state, _isWhite);

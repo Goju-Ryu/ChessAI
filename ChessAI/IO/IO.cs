@@ -20,6 +20,8 @@ namespace ChessAI.IO
             {
                 "new" => (NewGame, Array.Empty<string>()),
                 "quit" => (Quit, Array.Empty<string>()),
+                "force" => (Force, Array.Empty<string>()),
+                "go" => (Go, Array.Empty<string>()),
                 _ => IsMoveString(command) ? (Command.Move, new[] { command }) : (Unknown, new[] { command })
             };
         }
@@ -134,6 +136,8 @@ namespace ChessAI.IO
         Unknown,
         NewGame,
         Quit,
+        Force,
+        Go,
         Move
     }
 

@@ -8,7 +8,7 @@ namespace ChessAI
     {
         static void Main(string[] args)
         {
-            var arg = args.Length > 0 ? args[0] : "10";
+            var arg = args.Length > 0 ? args[0] : "9";
             
             var gameController = new GameController(false, TimeSpan.FromSeconds(int.Parse(arg)));
             

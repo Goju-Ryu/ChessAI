@@ -163,7 +163,7 @@ namespace ChessAI.DataClasses
             return move;
         }
 
-        public static Move Parse(string moveString, GameState state, bool isEnemyMove)
+        public static Move Parse(string moveString, GameState state)
         {
             //TODO implement more exhaustive analysis of moveString
             moveString = moveString.ToLower();
@@ -174,13 +174,7 @@ namespace ChessAI.DataClasses
 
             if (moveString.Length > 4)
             {
-                // Truth table:
-                //  enMove  |   isWhite |   result  |   color
-                //  1       |   1       |   0       |   black
-                //  1       |   0       |   1       |   white
-                //  0       |   1       |   1       |   white
-                //  0       |   0       |   0       |   black
-                var color = isEnemyMove ^ GameState.IsWhite ? White : Black;
+                var color = movePiece.IsWhite ? White : Black;
                 var promotionPiece = moveString[4] switch
                 {
                     'q' => new Piece(color | Queen, endPos),

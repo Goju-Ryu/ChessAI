@@ -37,7 +37,7 @@ namespace UnitTests.DataClasses
                 _ => ""
             };
 
-            var parsedMove = Move.Parse(castleMoveString, state, false);
+            var parsedMove = Move.Parse(castleMoveString, state);
             
             Assert.AreEqual(MoveType.Castling, parsedMove.MoveType);
             Assert.AreEqual(0x04, parsedMove.StartPos);
