@@ -149,7 +149,7 @@ namespace ChessAI.DataClasses
 
         public bool Equals(Piece other)
         {
-            return _piece == other._piece;
+            return this == other;
         }
 
         public override bool Equals(object obj)

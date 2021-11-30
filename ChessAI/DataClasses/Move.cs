@@ -123,7 +123,7 @@ namespace ChessAI.DataClasses
             var kingIndex = Board.StartPositions[isWhite ? (byte)(White | King) : (byte)(Black | King)][0];
             var movePiece = state.State[kingIndex];
 
-            var endPos = (byte)(kingIndex - rookPosition > 0 ? rookPosition + 2 : rookPosition - 1);
+            var endPos = (byte)((rookPosition & 0x0f) == 0 ? kingIndex - 2 : kingIndex + 2);
 
             var move = new Move(kingIndex, endPos, Castling, movePiece, new Piece(Empty));
             return move;

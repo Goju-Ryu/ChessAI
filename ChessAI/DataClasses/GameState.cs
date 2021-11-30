@@ -30,9 +30,6 @@ namespace ChessAI.DataClasses
         {
             State = board;
 
-            Span<Piece> tempBoardFields = stackalloc Piece[State.Fields.Length];
-            State.Fields.CopyTo(tempBoardFields);
-
             List<Piece> tempWhitePieceList = new List<Piece>();
             List<Piece> tempBlackPieceList = new List<Piece>();
 
@@ -51,7 +48,7 @@ namespace ChessAI.DataClasses
                     if (currentPiece.Position != index)
                     {
                         currentPiece = new Piece(currentPiece.Content, index);
-                        tempBoardFields[index] = currentPiece;
+                        State.Fields[index] = currentPiece;
                     }
 
                     if ((currentPiece.ColorAndType & White) == White)
@@ -64,8 +61,7 @@ namespace ChessAI.DataClasses
                     }
                 }
             }
-
-            State = new Board(tempBoardFields.ToArray());
+            
             WhitePieces = new PieceList(tempWhitePieceList.ToArray());
             BlackPieces = new PieceList(tempBlackPieceList.ToArray());
             PreviousMove = lastMove;
@@ -128,7 +124,7 @@ namespace ChessAI.DataClasses
             //If this is the AI' move check if castling is affected
             if ((canARankRookCastle || canHRankRookCastle) && IsWhite == move.MovePiece.IsWhite)
             {
-                if (move.MovePiece == King)
+                if (move.MovePiece.PieceType == King)
                 {
                     canARankRookCastle = false;
                     canHRankRookCastle = false;
@@ -220,10 +216,10 @@ namespace ChessAI.DataClasses
                     break;
 
                 case MoveType.Castling:
-                    var rookStartPos = move.StartPos - move.EndPos < 0 ? move.EndPos + 1 : move.EndPos - 2;
-                    var rookEndPos = move.StartPos - move.EndPos > 0 ? move.EndPos + 1 : move.EndPos - 2;
-                    var modifiedKing = new Piece(move.MovePiece.Content, move.EndPos);
-                    var modifiedRook = new Piece(State[rookStartPos].Content, rookEndPos);
+                    var rookStartPos = move.StartPos > move.EndPos ? move.EndPos - 2 : move.EndPos + 1;
+                    var rookEndPos = move.StartPos > move.EndPos ? move.EndPos + 1 : move.EndPos - 1;
+                    var modifiedKing = new Piece(move.MovePiece.ColorAndType, move.EndPos);
+                    var modifiedRook = new Piece(State[rookStartPos].ColorAndType, rookEndPos);
 
                     if (move.MovePiece.IsWhite)
                     {

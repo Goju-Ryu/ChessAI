@@ -35,8 +35,8 @@ namespace ChessAI.DataClasses
             { Black | Rook, new byte[] { 0x70, 0x77 } },
             { Black | Knight, new byte[] { 0x71, 0x76 } },
             { Black | Bishop, new byte[] { 0x72, 0x75 } },
-            { Black | Queen, new byte[] { 0x74 } },
-            { Black | King, new byte[] { 0x73 } }
+            { Black | Queen, new byte[] { 0x73 } },
+            { Black | King, new byte[] { 0x74 } }
         }.ToImmutableDictionary();
 
         private readonly Span<Piece> _fields;

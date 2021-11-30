@@ -105,13 +105,13 @@ namespace ChessAI.IO
             //e7e8q
             var ranks = "12345678";
             var files = "abcdefgh";
-
+            //TODO remember to check promotions not as ranks but as a seperate check
             if (moveString.Length < 4 || moveString.Length > 5)
             {
                 return false;
             }
 
-            for (int i = 0; i < moveString.Length; i++)
+            for (int i = 0; i < 4; i++)
             {
                 if ((i % 2) == 0 && !files.Contains(moveString[i], StringComparison.OrdinalIgnoreCase))
                 {
@@ -123,7 +123,9 @@ namespace ChessAI.IO
                     return false;
                 }
             }
-
+            if (moveString.Length == 5){
+		return "qrbk".Contains(moveString[4], StringComparison.OrdinalIgnoreCase); 
+	    }
             return true;
         }
     }
