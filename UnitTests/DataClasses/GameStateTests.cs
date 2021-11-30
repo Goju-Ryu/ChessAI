@@ -20,6 +20,11 @@ namespace UnitTests.DataClasses
             var pieces = new[] { _rook, _pawn, _queen }.ToList();
 
             var fields = new Piece[0x80];
+            for (byte i = 0; i < fields.Length; i++)
+            {
+                if(!Board.IsIndexValid(i)) continue;
+                fields[i] = new Piece(Empty, i);
+            }
             fields[_rook.Position] = _rook;
             fields[_pawn.Position] = _pawn;
             fields[_queen.Position] = _queen;

@@ -11,7 +11,8 @@ namespace BenchMarks
     [MemoryDiagnoser]
     public class MoveSelectorBenchmark
     {
-        [Params( 5, 6)] public int Depth { get; set; }
+        [Params( 3, 4, 5, 6, 8)] 
+        public int Depth { get; set; }
 
         // [Params(0, 3, 6)] public int InitialPathArraySize { get; set; }
 
@@ -26,7 +27,8 @@ namespace BenchMarks
         public IEnumerable<IMoveAnalyser> MoveAnalyserSource()
         {
             yield return new MoveAnalyserDummy();
-            // yield return new MoveAnalyserFast();
+            yield return new MoveAnalyserFast();
+            yield return new MoveAnalyserSimple();
         }
 
 
@@ -55,6 +57,7 @@ namespace BenchMarks
         {
             return _moveSelector.BestMoveImproved(GameState.CreateNewGameState(false), Depth);
         }
+        
 
         // [Benchmark]
         // public Move BestMoveIterative()

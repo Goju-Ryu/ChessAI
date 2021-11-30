@@ -89,8 +89,9 @@ namespace ChessAI.DataClasses
         public Board(List<Piece> pieceList)
         {
             var fields = new Piece[Width * Height];
-            for (int i = 0; i < fields.Length; i++)
+            for (byte i = 0; i < fields.Length; i++)
             {
+                if(!IsIndexValid(i)) continue;
                 fields[i] = new Piece(Empty, i);
             }
 

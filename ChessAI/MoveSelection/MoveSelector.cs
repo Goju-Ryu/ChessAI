@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ChessAI.DataClasses;
 using ChessAI.MoveSelection.MoveGeneration;
 using ChessAI.MoveSelection.StateAnalysis;
@@ -180,17 +178,14 @@ namespace ChessAI.MoveSelection
                     var child = state.ApplyMove(move);
                     var value = MinMax(searchDepth, currentDepth + 1, false, child, alpha, beta);
 
-                    if (value > alpha)
+                    if (value <= alpha) continue;
+                    if (value >= beta)
                     {
-                        alpha = value;
-
-                        if (alpha >= beta)
-                        {
-                            return alpha;
-                        }
-
-                        BestMoves[currentDepth] = move;
+                        return alpha;
                     }
+                        
+                    alpha = value;
+                    BestMoves[currentDepth] = move;
                 }
 
                 return alpha;
@@ -204,23 +199,19 @@ namespace ChessAI.MoveSelection
                     var child = state.ApplyMove(move);
                     var value = MinMax(searchDepth, currentDepth + 1, true, child, alpha, beta);
 
-                    if (value < beta)
+                    if (value >= beta) continue;
+                    if (alpha >= value)
                     {
-                        beta = value;
-
-                        if (alpha >= beta)
-                        {
-                            return beta;
-                        }
-
-                        BestMoves[currentDepth] = move;
+                        return beta;
                     }
+                    beta = value;
+                    BestMoves[currentDepth] = move;
                 }
 
                 return beta;
             }
         }
-        
+
         /**
          * <summary>
          * The implementation of the minMax algorithm using alpha pruning that we can use to search for the best move
@@ -233,7 +224,7 @@ namespace ChessAI.MoveSelection
          * <param name="beta">The value storing the minimiser's current best value</param>
          * <returns>The evaluation value of the best outcome</returns>
          */
-        protected int MinMaxImproved(int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
+        protected int MinMaxImproved( int searchDepth, int currentDepth, bool isMaximizer, in GameState state,
             int alpha = int.MinValue, int beta = int.MaxValue)
         {
             if (searchDepth <= currentDepth)
@@ -246,71 +237,50 @@ namespace ChessAI.MoveSelection
             var moves = _moveCalculator.CalculatePossibleMoves(state, _isWhite == isMaximizer);
             _moveAnalyser.SortMovesByBest(state, moves, BestMoves[currentDepth]);
 
-            if (isMaximizer)
+
+            Span<Piece> childBoardSpan = stackalloc Piece[0x80];
+            for (var index = 0; index < moves.Count; index++)
             {
-                Span<Piece> childBoardSpan = stackalloc Piece[0x80];
-                for (var index = 0; index < moves.Count; index++)
+                if (alpha >= beta) break;
+                
+                ++NodesVisited;
+                var move = moves[index];
+                var child = state.ApplyMove(move, childBoardSpan);
+                var value = MinMaxImproved(searchDepth, currentDepth + 1, !isMaximizer, child, alpha, beta);
+
+                if (isMaximizer)
                 {
-                    ++NodesVisited;
-                    var move = moves[index];
-                    var child = state.ApplyMove(move, childBoardSpan);
-                    var value = MinMaxImproved(searchDepth, currentDepth + 1, false, child, alpha, beta);
-
-                    if (value > alpha)
-                    {
-                        alpha = value;
-
-                        if (alpha >= beta)
-                        {
-                            return alpha;
-                        }
-
-                        BestMoves[currentDepth] = move;
-                    }
+                    if (value <= alpha) continue;
+                    
+                    alpha = value;
+                    BestMoves[currentDepth] = move;
                 }
-
-                return alpha;
-            }
-            else
-            {
-                Span<Piece> childBoardSpan = stackalloc Piece[0x80];
-                for (var index = 0; index < moves.Count; index++)
+                else
                 {
-                    ++NodesVisited;
-                    var move = moves[index];
-                    var child = state.ApplyMove(move, childBoardSpan);
-                    var value = MinMaxImproved(searchDepth, currentDepth + 1, true, child, alpha, beta);
-
-                    if (value < beta)
-                    {
-                        beta = value;
-
-                        if (alpha >= beta)
-                        {
-                            return beta;
-                        }
-
-                        BestMoves[currentDepth] = move;
-                    }
+                    if (value >= beta) continue;
+                    
+                    beta = value;
+                    BestMoves[currentDepth] = move;
                 }
-
-                return beta;
             }
+
+            return isMaximizer ? alpha : beta;
         }
-        
+
+
         /**
-         * <summary>
-         * An implementation of the minMax algorithm not using alpha/beta pruning or any other tricks.
-         * This should only be used for testing purposes and if it is required to visit every node.
-         * </summary>
-         * <param name="searchDepth">The desired depth to which it should search</param>
-         * <param name="currentDepth">The depth of the current node</param>
-         * <param name="isMaximizer">A value deciding which role the node takes on; maximiser or minimiser</param>
-         * <param name="state">The state of the game as it would look all moves leading to this node were taken</param>
-         * <param name="alpha">The value storing the maximiser's current best value</param>
-         * <param name="beta">The value storing the minimiser's current best value</param>
-         * <returns>The evaluation value of the best outcome</returns>
-         */
+     * <summary>
+     * An implementation of the minMax algorithm not using alpha/beta pruning or any other tricks.
+     * This should only be used for testing purposes and if it is required to visit every node.
+     * </summary>
+     * <param name="searchDepth">The desired depth to which it should search</param>
+     * <param name="currentDepth">The depth of the current node</param>
+     * <param name="isMaximizer">A value deciding which role the node takes on; maximiser or minimiser</param>
+     * <param name="state">The state of the game as it would look all moves leading to this node were taken</param>
+     * <param name="alpha">The value storing the maximiser's current best value</param>
+     * <param name="beta">The value storing the minimiser's current best value</param>
+     * <returns>The evaluation value of the best outcome</returns>
+     */
         protected int MinMaxNoCutoff(int searchDepth, int currentDepth, bool isMaximizer, in GameState state)
         {
             if (searchDepth <= currentDepth)
@@ -318,11 +288,11 @@ namespace ChessAI.MoveSelection
                 return _stateAnalyser.StaticAnalysis(state, _isWhite);
             }
 
-            // Generate moves, sort them and remove the previous best move to avoid
-            // it being used in other branches than the best
+// Generate moves, sort them and remove the previous best move to avoid
+// it being used in other branches than the best
             var moves = _moveCalculator.CalculatePossibleMoves(state, _isWhite == isMaximizer);
-            
-            
+
+
             if (isMaximizer)
             {
                 var currentBest = int.MinValue;

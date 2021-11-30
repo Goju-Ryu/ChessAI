@@ -9,11 +9,14 @@ namespace UnitTests
 {
     public class MinMaxTests
     {
+
         [Test]
-        public void NodeCutoffTest()
+        [Explicit]
+        public void NodeCutoffDevelopmentMinMax()
         {
-            var state = GameState.CreateNewGameState(false);
-            var searchDepth = 5;
+            var state1 = GameState.CreateNewGameState(false);
+            var state2 = GameState.CreateNewGameState(false);
+            var state3 = GameState.CreateNewGameState(false);
 
             var moveSelector = new TestMoveSelector
             (
@@ -23,7 +26,95 @@ namespace UnitTests
                 new MoveCalculator()
             );
 
+            var moveSelectorNoSort = new TestMoveSelector
+            (
+                false,
+                new StateAnalyserSimple(),
+                new MoveAnalyserDummy(),
+                new MoveCalculator()
+            );
+
+            var moveSelectorImproved = new TestMoveSelector
+            (
+                false,
+                new StateAnalyserSimple(),
+                new MoveAnalyserSimple(),
+                new MoveCalculator()
+            );
+
+            for (int searchDepth = 2; searchDepth < 6; searchDepth++)
+            {
+                moveSelector.TestMinMax(searchDepth, 0, true, state1);
+                moveSelector.TestMinMaxNoCutoff(searchDepth, 0, true, state1);
+
+                moveSelectorNoSort.TestMinMax(searchDepth, 0, true, state2);
+                moveSelectorNoSort.TestMinMaxNoCutoff(searchDepth, 0, true, state2);
+
+                moveSelectorImproved.TestMinMax(searchDepth, 0, true, state3);
+
+                Assert.AreEqual(moveSelectorNoSort.NodesVisitedMax, moveSelector.NodesVisitedMax);
+
+                var maxNodes = moveSelector.NodesVisitedMax;
+
+                var noSortNodes = moveSelectorNoSort.NodesVisited;
+                var sortNodes = moveSelector.NodesVisited;
+                var impSortNodes = moveSelectorImproved.NodesVisited;
+
+                var noSortCutoff = maxNodes - noSortNodes;
+                var sortCutoff = maxNodes - sortNodes;
+                var impSortCutoff = maxNodes - impSortNodes;
+
+                var noSortTotalCutPercent = (float)noSortCutoff / maxNodes * 100;
+                var sortTotalCutPercent = (float)sortCutoff / maxNodes * 100;
+                var impSortTotalCutPercent = (float)impSortCutoff / maxNodes * 100;
+
+                var sortRelativeCutPercent = (float) (noSortNodes - sortNodes) / noSortNodes * 100;
+                var impSortRelativeCutPercent = (float)(noSortNodes - impSortNodes) / noSortNodes * 100;
+
+
+                Console.WriteLine(
+                    $@"
+Results with depth {searchDepth}:
+    Max Nodes in search:            {maxNodes}
+    Nodes visited without sorting:  {noSortNodes}
+    Nodes visited with sorting:     {sortNodes}
+    Nodes visited with new sorting: {impSortNodes}
+
+    cutoff without sorting:         {noSortCutoff}({noSortTotalCutPercent}%)  
+    cutoff with sorting:            {sortCutoff}({sortTotalCutPercent}%)  compared to no sort: {sortRelativeCutPercent}
+    cutoff with new sorting:        {impSortCutoff}({impSortTotalCutPercent}%)  compared to no sort: {impSortRelativeCutPercent}
+ 
+"
+                );
+            }
+        }
+
+        [Test]
+        [Explicit]
+        public void NodeCutoffTest()
+        {
+            var searchDepth = 5;
+
+            var state = GameState.CreateNewGameState(false);
+            var moveSelector = new TestMoveSelector
+            (
+                false,
+                new StateAnalyserSimple(),
+                new MoveAnalyserFast(),
+                new MoveCalculator()
+            );
+            
+            var state2 = GameState.CreateNewGameState(false);
+            var moveSelector2 = new TestMoveSelector
+            (
+                false,
+                new StateAnalyserSimple(),
+                new MoveAnalyserFast(),
+                new MoveCalculator()
+            );
+
             moveSelector.TestMinMax(searchDepth, 0, true, state);
+            moveSelector2.TestMinMaxImproved(searchDepth, 0, true, state2);
             moveSelector.TestMinMaxNoCutoff(searchDepth, 0, true, state);
 
             Assert.Greater(moveSelector.NodesVisited, 0);
@@ -57,89 +148,13 @@ Results:
 
     cutoff without sorting:         {moveSelector.NodesVisitedMax - moveSelectorNoSort.NodesVisited}
     cutoff with sorting:            {moveSelector.NodesVisitedMax - moveSelector.NodesVisited}
+    cutoff with minMaxImproved:     {moveSelector.NodesVisitedMax - moveSelector2.NodesVisited}
                 "
             );
         }
 
         [Test]
-        public void NodeCutoffDevelopmentMinMax()
-        {
-            var state1 = GameState.CreateNewGameState(false);
-            var state2 = GameState.CreateNewGameState(false);
-            var state3 = GameState.CreateNewGameState(false);
-
-            var moveSelector = new TestMoveSelector
-            (
-                false,
-                new StateAnalyserSimple(),
-                new MoveAnalyserFast(),
-                new MoveCalculator()
-            );
-
-            var moveSelectorNoSort = new TestMoveSelector
-            (
-                false,
-                new StateAnalyserSimple(),
-                new MoveAnalyserDummy(),
-                new MoveCalculator()
-            );
-
-            var moveSelectorImproved = new TestMoveSelector
-            (
-                false,
-                new StateAnalyserSimple(),
-                new MoveAnalyserFastImproved(),
-                new MoveCalculator()
-            );
-
-            for (int searchDepth = 2; searchDepth < 6; searchDepth++)
-            {
-                moveSelector.TestMinMax(searchDepth, 0, true, state1);
-                moveSelector.TestMinMaxNoCutoff(searchDepth, 0, true, state1);
-
-                moveSelectorNoSort.TestMinMax(searchDepth, 0, true, state2);
-                moveSelectorNoSort.TestMinMaxNoCutoff(searchDepth, 0, true, state2);
-
-                moveSelectorImproved.TestMinMax(searchDepth, 0, true, state3);
-
-                Assert.AreEqual(moveSelectorNoSort.NodesVisitedMax, moveSelector.NodesVisitedMax);
-
-                var maxNodes = moveSelector.NodesVisitedMax;
-
-                var noSortNodes = moveSelectorNoSort.NodesVisited;
-                var sortNodes = moveSelector.NodesVisited;
-                var impSortNodes = moveSelectorImproved.NodesVisited;
-
-                var noSortCutoff = maxNodes - noSortNodes;
-                var sortCutoff = maxNodes - sortNodes;
-                var impSortCutoff = maxNodes - impSortNodes;
-
-                var noSortTotalCutPercent = (float)noSortCutoff / maxNodes * 100;
-                var sortTotalCutPercent = (float)sortCutoff / maxNodes * 100;
-                var impSortTotalCutPercent = (float)impSortCutoff / maxNodes * 100;
-
-                var sortRelativeCutPercent = (float)sortCutoff / noSortCutoff * 100;
-                var impSortRelativeCutPercent = (float)impSortCutoff / noSortCutoff * 100;
-
-
-                Console.WriteLine(
-                    $@"
-Results with depth {searchDepth}:
-    Max Nodes in search:            {maxNodes}
-    Nodes visited without sorting:  {noSortNodes}
-    Nodes visited with sorting:     {sortNodes}
-    Nodes visited with new sorting: {impSortNodes}
-
-    cutoff without sorting:         {noSortCutoff}({noSortTotalCutPercent}%)  
-    cutoff with sorting:            {sortCutoff}({sortTotalCutPercent}%)  compared to no sort: {sortRelativeCutPercent}
-    cutoff with new sorting:        {impSortCutoff}({impSortTotalCutPercent}%)  compared to no sort: {impSortRelativeCutPercent}
- 
-"
-                );
-            }
-        }
-
-        [Test]
+        [Explicit]
         public void NodeCutoffDevelopmentBestMoveIterative()
         {
             var state1 = GameState.CreateNewGameState(false);
@@ -166,7 +181,7 @@ Results with depth {searchDepth}:
             (
                 false,
                 new StateAnalyserSimple(),
-                new MoveAnalyserFastImproved(),
+                new MoveAnalyserSimple(),
                 new MoveCalculator()
             );
 
